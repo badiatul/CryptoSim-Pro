@@ -41,3 +41,26 @@ def run():
     if st.button("Proses"):
         result = encrypt(text, rails) if mode == "Enkripsi" else decrypt(text, rails)
         st.success(f"Hasil: {result}")
+def run():
+    import streamlit as st
+    from datetime import datetime
+    from .cipher_utils import railfence_encrypt as encrypt, railfence_decrypt as decrypt
+
+    mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
+    teks = st.text_area("Masukkan Teks")
+    key = st.number_input("Masukkan Jumlah Rel", min_value=2, value=3)
+
+    if st.button("🔐 Proses"):
+        if mode == "Enkripsi":
+            hasil = encrypt(teks, int(key))
+        else:
+            hasil = decrypt(teks, int(key))
+        st.success(hasil)
+
+        st.session_state.history.append({
+            "algoritma": "Rail Fence Cipher",
+            "mode": mode,
+            "input": teks,
+            "hasil": hasil,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
