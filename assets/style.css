@@ -1,18 +1,57 @@
+/* Warna latar belakang seluruh halaman */
 body {
-    background-color: #e8f5e9;
+    background-color: #e8f5e9; /* hijau muda */
 }
-.css-1d391kg {
-    background-color: #a5d6a7 !important;
+
+/* Warna latar belakang sidebar dan container utama */
+[data-testid="stSidebar"] {
+    background-color: #a5d6a7; /* hijau daun */
 }
+
+/* Header dan teks utama */
 h1, h2, h3, h4, h5, h6, p {
-    color: #2e7d32;
+    color: #2e7d32; /* hijau tua */
 }
+
+/* Tombol utama */
 .stButton > button {
     background-color: #66bb6a;
     color: white;
     border-radius: 8px;
     border: none;
+    font-weight: bold;
+    padding: 0.5em 1em;
 }
+
 .stButton > button:hover {
     background-color: #388e3c;
 }
+
+/* Box hasil sukses (warna hijau terang) */
+.stAlert > div {
+    background-color: #c8e6c9 !important;
+    color: #1b5e20 !important;
+}
+
+/* Riwayat kotak */
+div[data-testid="stExpander"] > div > div {
+    background-color: #e0f2f1 !important;
+    border-radius: 10px;
+}
+
+/* Input teks dan select */
+input, textarea, .stTextInput > div > div, .stTextArea > div > div, .stNumberInput > div > div {
+    background-color: #f1f8e9;
+    border-radius: 5px;
+}
+
+/* Label dan radio button */
+.stRadio > label, .stSelectbox > label {
+    color: #2e7d32;
+}
+
+/* Footer */
+footer {
+    visibility: hidden;
+}
+
