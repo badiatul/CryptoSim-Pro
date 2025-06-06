@@ -24,7 +24,17 @@ def log_history(alg, mode, input_text, result):
     })
 
 # Sidebar pilih algoritma
-menu = ["Caesar Cipher", "Vigenère Cipher", "Rail Fence Cipher", "Playfair Cipher", "Hill Cipher", "Beaufort Cipher", "Columnar Transposition Cipher", "LSB Steganography"]
+menu = [
+    "Caesar Cipher",
+    "Vigenère Cipher",
+    "Rail Fence Cipher",
+    "Playfair Cipher",
+    "Hill Cipher",
+    "Beaufort Cipher",
+    "Columnar Transposition Cipher",
+    "LSB Steganography"
+]
+
 choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
 print("DAFTAR MENU:", menu)
 print("PILIHAN:", choice)
