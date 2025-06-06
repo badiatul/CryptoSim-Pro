@@ -1,41 +1,39 @@
+```python
 import streamlit as st
+from datetime import datetime
 
-def generate_key(text, key):
-    key = list(key)
-    if len(key) == 0:
-        return "A" * len(text)
-    while len(key) < len(text):
-        key.append(key[len(key) % len(key)])
-    return "".join(key)
+def repeat_key(key, length):
+    return (key * (length // len(key) + 1))[:length]
 
 def encrypt(text, key):
-    key = generate_key(text, key)
-    cipher = ""
-    for i in range(len(text)):
-        if text[i].isalpha():
-            offset = 65 if text[i].isupper() else 97
-            cipher += chr((ord(text[i]) + ord(key[i]) - 2 * offset) % 26 + offset)
+    text = text.upper()
+    key = repeat_key(key.upper(), len(text))
+    result = ""
+    for t, k in zip(text, key):
+        if t.isalpha():
+            result += chr(((ord(t) - 65 + ord(k) - 65) % 26) + 65)
         else:
-            cipher += text[i]
-    return cipher
+            result += t
+    return result
 
-def decrypt(cipher, key):
-    key = generate_key(cipher, key)
-    text = ""
-    for i in range(len(cipher)):
-        if cipher[i].isalpha():
-            offset = 65 if cipher[i].isupper() else 97
-            text += chr((ord(cipher[i]) - ord(key[i]) + 26) % 26 + offset)
+def decrypt(text, key):
+    text = text.upper()
+    key = repeat_key(key.upper(), len(text))
+    result = ""
+    for t, k in zip(text, key):
+        if t.isalpha():
+            result += chr(((ord(t) - 65 - (ord(k) - 65)) % 26) + 65)
         else:
-            text += cipher[i]
-    return text
+            result += t
+    return result
 
 def run(log_history):
     st.header("🔐 Vigenère Cipher")
     mode = st.radio("Pilih mode", ["Enkripsi", "Dekripsi"])
     text = st.text_input("Masukkan teks")
-    key = st.text_input("Masukkan kunci")
-    if st.button("Proses"):
+    key = st.text_input("Masukkan kunci (huruf)")
+    if st.button("Proses") and key.isalpha():
         result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
         st.success(f"Hasil: {result}")
         log_history("Vigenère Cipher", mode, text, result)
+```
