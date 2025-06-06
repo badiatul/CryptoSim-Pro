@@ -1,5 +1,4 @@
 import streamlit as st
-from utils import log_history  # pastikan utils.py ada dan berisi fungsi log_history
 
 def encrypt(text, shift):
     result = ""
@@ -14,15 +13,16 @@ def encrypt(text, shift):
 def decrypt(text, shift):
     return encrypt(text, -shift)
 
-def run():
+def run(log_history):
     st.header("🔐 Caesar Cipher")
     mode = st.radio("Pilih mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("Masukkan teks")
+    text = st.text_input("Masukkan teks")
     shift = st.slider("Pergeseran (Shift)", 1, 25, 3)
 
     if st.button("Proses"):
-        result = encrypt(text, shift) if mode == "Enkripsi" else decrypt(text, shift)
+        if mode == "Enkripsi":
+            result = encrypt(text, shift)
+        else:
+            result = decrypt(text, shift)
         st.success(f"Hasil: {result}")
-
-        # Simpan ke riwayat
         log_history("Caesar Cipher", mode, text, result)
