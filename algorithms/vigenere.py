@@ -1,39 +1,51 @@
 import streamlit as st
-from utils import log_history
 
-def extend_key(text, key):
+def generate_key(text, key):
     key = key.upper()
-    return (key * (len(text) // len(key))) + key[:len(text) % len(key)]
+    key_extended = ""
+    key_index = 0
+    for char in text:
+        if char.isalpha():
+            key_extended += key[key_index % len(key)]
+            key_index += 1
+        else:
+            key_extended += char
+    return key_extended
 
 def encrypt(text, key):
     text = text.upper()
-    key = extend_key(text, key)
+    key = generate_key(text, key)
     result = ""
-    for i in range(len(text)):
-        if text[i].isalpha():
-            result += chr((ord(text[i]) + ord(key[i]) - 2*65) % 26 + 65)
+    for t, k in zip(text, key):
+        if t.isalpha():
+            c = (ord(t) + ord(k) - 2 * 65) % 26 + 65
+            result += chr(c)
         else:
-            result += text[i]
+            result += t
     return result
 
 def decrypt(text, key):
     text = text.upper()
-    key = extend_key(text, key)
+    key = generate_key(text, key)
     result = ""
-    for i in range(len(text)):
-        if text[i].isalpha():
-            result += chr((ord(text[i]) - ord(key[i]) + 26) % 26 + 65)
+    for t, k in zip(text, key):
+        if t.isalpha():
+            c = (ord(t) - ord(k) + 26) % 26 + 65
+            result += chr(c)
         else:
-            result += text[i]
+            result += t
     return result
 
-def run():
+def run(log_history):
     st.header("🔐 Vigenère Cipher")
     mode = st.radio("Pilih mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("Masukkan teks")
+    text = st.text_input("Masukkan teks")
     key = st.text_input("Masukkan kunci (huruf)")
 
-    if st.button("Proses") and key.isalpha():
-        result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
+    if st.button("Proses") and key.isalpha() and key != "":
+        if mode == "Enkripsi":
+            result = encrypt(text, key)
+        else:
+            result = decrypt(text, key)
         st.success(f"Hasil: {result}")
         log_history("Vigenère Cipher", mode, text, result)
