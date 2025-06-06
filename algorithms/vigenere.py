@@ -1,4 +1,6 @@
 import streamlit as st
+from utils import log_history
+
 
 def vigenere_encrypt(text, key):
     key = key.upper()
