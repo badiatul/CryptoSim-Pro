@@ -69,3 +69,5 @@ with st.expander("⬇️ Unduh Hasil Enkripsi/Dekripsi"):
         st.warning("Belum ada hasil yang bisa diunduh.")
 
 st.markdown("<p style='text-align: center; color: grey;'>© 2025 CryptoSim Pro 💚</p>", unsafe_allow_html=True)
+with open("style.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
