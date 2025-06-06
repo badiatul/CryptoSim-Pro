@@ -98,3 +98,4 @@ def run():
                 })
         except Exception as e:
             st.error(f"Gagal memproses: {e}")
+log_history("Playfair Cipher", mode, text, result)
