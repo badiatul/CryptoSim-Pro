@@ -1,6 +1,6 @@
 import streamlit as st
 import datetime
-from algorithms import caesar, vigenere, railfence, playfair, hill
+from algorithms import caesar, vigenere, railfence, playfair, hill, beaufort
 
 st.set_page_config(page_title="CryptoSim Pro", layout="centered", page_icon="🛡️")
 
@@ -24,7 +24,7 @@ def log_history(alg, mode, input_text, result):
     })
 
 # Sidebar pilih algoritma
-menu = ["Caesar Cipher", "Vigenère Cipher", "Rail Fence Cipher", "Playfair Cipher", "Hill Cipher"]
+menu = ["Caesar Cipher", "Vigenère Cipher", "Rail Fence Cipher", "Playfair Cipher", "Hill Cipher", "Beaufort Cipher"]
 choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
 
 # Jalankan algoritma sesuai pilihan
@@ -38,6 +38,8 @@ elif choice == "Playfair Cipher":
     playfair.run(log_history)
 elif choice == "Hill Cipher":
     hill.run(log_history)
+elif choice == "Beaufort Cipher":
+    beaufort.run(log_history)
 
 # Riwayat
 with st.expander("🕘 Lihat Riwayat"):
