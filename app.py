@@ -42,6 +42,7 @@ elif choice == "Hill Cipher":
 elif choice == "Beaufort Cipher":
     beaufort.run(log_history)
 elif choice == "Columnar Transposition Cipher":
+    print("Columnar dipanggil")
     columnar.run(log_history)
 
 # Riwayat
