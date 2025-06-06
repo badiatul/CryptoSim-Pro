@@ -66,3 +66,4 @@ def run():
             "hasil": hasil,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
+log_history("Railfence Cipher", mode, text, result)
