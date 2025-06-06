@@ -1,61 +1,47 @@
 import streamlit as st
-from utils import log_history
 
-def encrypt(text, key):
-    rail = ['' for _ in range(key)]
-    direction_down = False
-    row = 0
+def encrypt(text, rails):
+    fence = [[] for _ in range(rails)]
+    rail = 0
+    var = 1
 
     for char in text:
-        rail[row] += char
-        if row == 0 or row == key - 1:
-            direction_down = not direction_down
-        row += 1 if direction_down else -1
+        fence[rail].append(char)
+        rail += var
+        if rail == 0 or rail == rails - 1:
+            var = -var
+    return "".join(["".join(row) for row in fence])
 
-    return ''.join(rail)
-
-def decrypt(cipher, key):
-    rail = [['\n' for _ in range(len(cipher))] for _ in range(key)]
-    index = 0
-    direction_down = None
-    row, col = 0, 0
+def decrypt(cipher, rails):
+    pattern = [None] * len(cipher)
+    rail = 0
+    var = 1
 
     for i in range(len(cipher)):
-        if row == 0:
-            direction_down = True
-        if row == key - 1:
-            direction_down = False
-        rail[row][col] = '*'
-        col += 1
-        row += 1 if direction_down else -1
+        pattern[i] = rail
+        rail += var
+        if rail == 0 or rail == rails - 1:
+            var = -var
 
+    result = [None] * len(cipher)
     index = 0
-    for i in range(key):
-        for j in range(len(cipher)):
-            if rail[i][j] == '*' and index < len(cipher):
-                rail[i][j] = cipher[index]
+    for r in range(rails):
+        for i in range(len(cipher)):
+            if pattern[i] == r:
+                result[i] = cipher[index]
                 index += 1
+    return "".join(result)
 
-    result = ""
-    row, col = 0, 0
-    for i in range(len(cipher)):
-        if row == 0:
-            direction_down = True
-        if row == key - 1:
-            direction_down = False
-        result += rail[row][col]
-        col += 1
-        row += 1 if direction_down else -1
-
-    return result
-
-def run():
+def run(log_history):
     st.header("🔐 Rail Fence Cipher")
     mode = st.radio("Pilih mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("Masukkan teks")
-    key = st.slider("Jumlah rel", 2, 10, 3)
+    text = st.text_input("Masukkan teks")
+    rails = st.slider("Jumlah Rail", 2, 10, 3)
 
     if st.button("Proses"):
-        result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
+        if mode == "Enkripsi":
+            result = encrypt(text, rails)
+        else:
+            result = decrypt(text, rails)
         st.success(f"Hasil: {result}")
         log_history("Rail Fence Cipher", mode, text, result)
