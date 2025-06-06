@@ -73,3 +73,18 @@ st.markdown(
 )
 with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+st.sidebar.title("🧰 Menu Tambahan")
+
+if st.sidebar.button("🕘 Lihat Riwayat"):
+    st.subheader("Riwayat Enkripsi / Dekripsi")
+    if "history" in st.session_state and st.session_state["history"]:
+        for item in reversed(st.session_state["history"]):
+            st.markdown(f"**{item['timestamp']}** - {item['algoritma']} ({item['mode']})")
+            st.text(f"Input: {item['input']}")
+            st.text(f"Hasil: {item['hasil']}")
+            st.markdown("---")
+    else:
+        st.info("Belum ada riwayat.")
+
+if "last_result" in st.session_state and st.session_state["last_result"]:
+    st.sidebar.download_button("⬇️ Unduh Hasil Terakhir", st.session_state["last_result"], file_name="hasil_terakhir.txt")
