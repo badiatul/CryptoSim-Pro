@@ -56,3 +56,26 @@ def run():
     if st.button("Proses"):
         result = hill_encrypt(text, key_matrix) if mode == "Enkripsi" else hill_decrypt(text, key_matrix)
         st.success(f"Hasil: {result}")
+def run():
+    import streamlit as st
+    from datetime import datetime
+    from .cipher_utils import hill_encrypt as encrypt, hill_decrypt as decrypt
+
+    mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
+    teks = st.text_area("Masukkan Teks")
+    key = st.text_input("Masukkan Matriks Kunci (misal: 2 3; 1 4)")
+
+    if st.button("🔐 Proses"):
+        if mode == "Enkripsi":
+            hasil = encrypt(teks, key)
+        else:
+            hasil = decrypt(teks, key)
+        st.success(hasil)
+
+        st.session_state.history.append({
+            "algoritma": "Hill Cipher",
+            "mode": mode,
+            "input": teks,
+            "hasil": hasil,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
