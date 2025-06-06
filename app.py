@@ -9,14 +9,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-menu = ["Caesar Cipher", "Vigenère Cipher", "Rail Fence Cipher", "Playfair Cipher", "Hill Cipher"]
-choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
-
-# Inisialisasi riwayat
+# Inisialisasi sesi
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Fungsi untuk menyimpan riwayat
+# Fungsi log_history global
 def log_history(alg, mode, input_text, result):
     st.session_state.history.append({
         "algoritma": alg,
@@ -26,17 +23,21 @@ def log_history(alg, mode, input_text, result):
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     })
 
-# Halaman utama algoritma
+# Sidebar pilih algoritma
+menu = ["Caesar Cipher", "Vigenère Cipher", "Rail Fence Cipher", "Playfair Cipher", "Hill Cipher"]
+choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
+
+# Jalankan algoritma sesuai pilihan
 if choice == "Caesar Cipher":
-    caesar.run()
+    caesar.run(log_history)
 elif choice == "Vigenère Cipher":
-    vigenere.run()
+    vigenere.run(log_history)
 elif choice == "Rail Fence Cipher":
-    railfence.run()
+    railfence.run(log_history)
 elif choice == "Playfair Cipher":
-    playfair.run()
+    playfair.run(log_history)
 elif choice == "Hill Cipher":
-    hill.run()
+    hill.run(log_history)
 
 # Riwayat
 with st.expander("🕘 Lihat Riwayat"):
@@ -53,7 +54,7 @@ with st.expander("🕘 Lihat Riwayat"):
     else:
         st.info("Belum ada riwayat.")
 
-# Fitur download
+# Unduhan
 with st.expander("⬇️ Unduh Hasil Enkripsi/Dekripsi"):
     if st.session_state.history:
         last = st.session_state.history[-1]
@@ -67,24 +68,4 @@ with st.expander("⬇️ Unduh Hasil Enkripsi/Dekripsi"):
     else:
         st.warning("Belum ada hasil yang bisa diunduh.")
 
-st.markdown(
-    "<p style='text-align: center; color: grey;'>© 2025 CryptoSim Pro by Sayangmu 💚</p>",
-    unsafe_allow_html=True
-)
-with open("style.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-st.sidebar.title("🧰 Menu Tambahan")
-
-if st.sidebar.button("🕘 Lihat Riwayat"):
-    st.subheader("Riwayat Enkripsi / Dekripsi")
-    if "history" in st.session_state and st.session_state["history"]:
-        for item in reversed(st.session_state["history"]):
-            st.markdown(f"**{item['timestamp']}** - {item['algoritma']} ({item['mode']})")
-            st.text(f"Input: {item['input']}")
-            st.text(f"Hasil: {item['hasil']}")
-            st.markdown("---")
-    else:
-        st.info("Belum ada riwayat.")
-
-if "last_result" in st.session_state and st.session_state["last_result"]:
-    st.sidebar.download_button("⬇️ Unduh Hasil Terakhir", st.session_state["last_result"], file_name="hasil_terakhir.txt")
+st.markdown("<p style='text-align: center; color: grey;'>© 2025 CryptoSim Pro 💚</p>", unsafe_allow_html=True)
