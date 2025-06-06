@@ -1,6 +1,4 @@
-```python
 import streamlit as st
-from datetime import datetime
 import numpy as np
 
 def mod_inverse(a, m):
@@ -9,47 +7,36 @@ def mod_inverse(a, m):
             return x
     return None
 
-def encrypt(text, key):
+def hill_encrypt(text, key_matrix):
     text = text.upper().replace(" ", "")
     while len(text) % 2 != 0:
         text += 'X'
     result = ""
     for i in range(0, len(text), 2):
         pair = [ord(text[i]) - 65, ord(text[i+1]) - 65]
-        res = np.dot(key, pair) % 26
-        result += chr(res[0]+65) + chr(res[1]+65)
+        res = np.dot(key_matrix, pair) % 26
+        result += chr(res[0] + 65) + chr(res[1] + 65)
     return result
 
-def decrypt(text, key):
-    det = int(np.round(np.linalg.det(key)))
+def hill_decrypt(text, key_matrix):
+    det = int(np.round(np.linalg.det(key_matrix)))
     det_inv = mod_inverse(det % 26, 26)
     if det_inv is None:
-        return "Kunci tidak memiliki invers modulo."
-
-    adj = np.round(np.linalg.inv(key) * det).astype(int) % 26
-    key_inv = (det_inv * adj) % 26
-
-    text = text.upper().replace(" ", "")
-    result = ""
-    for i in range(0, len(text), 2):
-        pair = [ord(text[i]) - 65, ord(text[i+1]) - 65]
-        res = np.dot(key_inv, pair) % 26
-        result += chr(res[0]+65) + chr(res[1]+65)
-    return result
+        return "Matrix tidak dapat dibalik."
+    adj = np.round(det * np.linalg.inv(key_matrix)).astype(int) % 26
+    inv_matrix = (det_inv * adj) % 26
+    return hill_encrypt(text, inv_matrix)
 
 def run(log_history):
-    st.header("🔐 Hill Cipher")
-    mode = st.radio("Pilih mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_input("Masukkan teks")
-    a = st.number_input("Key A", value=3)
-    b = st.number_input("Key B", value=3)
-    c = st.number_input("Key C", value=2)
-    d = st.number_input("Key D", value=5)
-
-    key = np.array([[a, b], [c, d]])
-
+    st.subheader("🔐 Hill Cipher (2x2)")
+    mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
+    text = st.text_area("Masukkan Teks")
+    a = st.number_input("Key[0][0]", 0, 25, 3)
+    b = st.number_input("Key[0][1]", 0, 25, 3)
+    c = st.number_input("Key[1][0]", 0, 25, 2)
+    d = st.number_input("Key[1][1]", 0, 25, 5)
     if st.button("Proses"):
-        result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
-        st.success(f"Hasil: {result}")
+        key_matrix = np.array([[a, b], [c, d]])
+        result = hill_encrypt(text, key_matrix) if mode == "Enkripsi" else hill_decrypt(text, key_matrix)
+        st.success(result)
         log_history("Hill Cipher", mode, text, result)
-```
