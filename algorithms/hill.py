@@ -1,54 +1,55 @@
+```python
 import streamlit as st
+from datetime import datetime
 import numpy as np
 
-def mod_inverse(matrix, modulus):
-    det = int(np.round(np.linalg.det(matrix)))
-    det_inv = pow(det, -1, modulus)
-    matrix_mod_inv = det_inv * np.round(det * np.linalg.inv(matrix)).astype(int) % modulus
-    return matrix_mod_inv
-
-def text_to_matrix(text):
-    return [ord(c.upper()) - 65 for c in text]
-
-def matrix_to_text(matrix):
-    return ''.join([chr(int(round(num)) % 26 + 65) for num in matrix])
+def mod_inverse(a, m):
+    for x in range(1, m):
+        if (a * x) % m == 1:
+            return x
+    return None
 
 def encrypt(text, key):
     text = text.upper().replace(" ", "")
     while len(text) % 2 != 0:
         text += 'X'
-    key_matrix = np.array(key)
     result = ""
     for i in range(0, len(text), 2):
-        pair = np.array(text_to_matrix(text[i:i+2]))
-        enc = np.dot(key_matrix, pair) % 26
-        result += matrix_to_text(enc)
+        pair = [ord(text[i]) - 65, ord(text[i+1]) - 65]
+        res = np.dot(key, pair) % 26
+        result += chr(res[0]+65) + chr(res[1]+65)
     return result
 
-def decrypt(cipher, key):
-    key_matrix = np.array(key)
-    inv_key = mod_inverse(key_matrix, 26)
+def decrypt(text, key):
+    det = int(np.round(np.linalg.det(key)))
+    det_inv = mod_inverse(det % 26, 26)
+    if det_inv is None:
+        return "Kunci tidak memiliki invers modulo."
+
+    adj = np.round(np.linalg.inv(key) * det).astype(int) % 26
+    key_inv = (det_inv * adj) % 26
+
+    text = text.upper().replace(" ", "")
     result = ""
-    for i in range(0, len(cipher), 2):
-        pair = np.array(text_to_matrix(cipher[i:i+2]))
-        dec = np.dot(inv_key, pair) % 26
-        result += matrix_to_text(dec)
+    for i in range(0, len(text), 2):
+        pair = [ord(text[i]) - 65, ord(text[i+1]) - 65]
+        res = np.dot(key_inv, pair) % 26
+        result += chr(res[0]+65) + chr(res[1]+65)
     return result
 
 def run(log_history):
     st.header("🔐 Hill Cipher")
     mode = st.radio("Pilih mode", ["Enkripsi", "Dekripsi"])
     text = st.text_input("Masukkan teks")
-    matrix_input = st.text_input("Masukkan matriks kunci 2x2 (misal: 3,3,2,5)")
+    a = st.number_input("Key A", value=3)
+    b = st.number_input("Key B", value=3)
+    c = st.number_input("Key C", value=2)
+    d = st.number_input("Key D", value=5)
+
+    key = np.array([[a, b], [c, d]])
+
     if st.button("Proses"):
-        try:
-            values = list(map(int, matrix_input.split(',')))
-            if len(values) != 4:
-                st.error("Matriks harus terdiri dari 4 angka")
-                return
-            key = [[values[0], values[1]], [values[2], values[3]]]
-            result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
-            st.success(f"Hasil: {result}")
-            log_history("Hill Cipher", mode, text, result)
-        except:
-            st.error("Format matriks tidak valid")
+        result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
+        st.success(f"Hasil: {result}")
+        log_history("Hill Cipher", mode, text, result)
+```
