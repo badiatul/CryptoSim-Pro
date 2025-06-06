@@ -33,3 +33,12 @@ def run(log_history):
         result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
         st.success(result)
         log_history("Columnar Transposition Cipher", mode, text, result)
+# algorithms/columnar.py
+import streamlit as st
+
+def run(log_history):
+    st.subheader("📤 Columnar Transposition Cipher")
+    st.write("Ini hanya uji coba awal, fungsi belum aktif.")
+    if st.button("Test Log"):
+        log_history("Columnar Cipher", "Test Mode", "abc", "xyz")
+        st.success("Berhasil ditambahkan ke riwayat.")
