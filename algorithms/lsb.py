@@ -1,71 +1,69 @@
-from PIL import Image
 import streamlit as st
+from PIL import Image
+import io
 
-def embed_lsb(message: str, image_path: str, output_path: str) -> None:
-    img = Image.open(image_path)
-    encoded = img.copy()
-    width, height = img.size
-    message += chr(0)  # Null terminator
+def encode_lsb(image: Image.Image, message: str) -> Image.Image:
+    binary_message = ''.join([format(ord(char), '08b') for char in message]) + '1111111111111110'
+    encoded = image.copy()
+    pixels = encoded.load()
 
-    binary_message = ''.join([format(ord(c), '08b') for c in message])
     data_index = 0
-    max_capacity = width * height * 3
+    for y in range(encoded.height):
+        for x in range(encoded.width):
+            if data_index >= len(binary_message):
+                return encoded
+            r, g, b = pixels[x, y]
+            r = (r & ~1) | int(binary_message[data_index])
+            data_index += 1
+            if data_index < len(binary_message):
+                g = (g & ~1) | int(binary_message[data_index])
+                data_index += 1
+            if data_index < len(binary_message):
+                b = (b & ~1) | int(binary_message[data_index])
+                data_index += 1
+            pixels[x, y] = (r, g, b)
+    return encoded
 
-    if len(binary_message) > max_capacity:
-        raise ValueError("Pesan terlalu panjang untuk disisipkan ke dalam gambar.")
-
-    for y in range(height):
-        for x in range(width):
-            pixel = list(img.getpixel((x, y)))
-            for n in range(3):
-                if data_index < len(binary_message):
-                    pixel[n] = pixel[n] & ~1 | int(binary_message[data_index])
-                    data_index += 1
-            encoded.putpixel((x, y), tuple(pixel))
-    
-    encoded.save(output_path)
-
-def extract_lsb(image_path: str) -> str:
-    img = Image.open(image_path)
-    binary_data = ""
-    for y in range(img.height):
-        for x in range(img.width):
-            pixel = img.getpixel((x, y))
-            for n in range(3):
-                binary_data += str(pixel[n] & 1)
-
-    chars = [chr(int(binary_data[i:i+8], 2)) for i in range(0, len(binary_data), 8)]
-    return ''.join(chars).split(chr(0))[0]
+def decode_lsb(image: Image.Image) -> str:
+    pixels = image.load()
+    binary_data = ''
+    for y in range(image.height):
+        for x in range(image.width):
+            r, g, b = pixels[x, y]
+            binary_data += str(r & 1)
+            binary_data += str(g & 1)
+            binary_data += str(b & 1)
+    bytes_data = [binary_data[i:i+8] for i in range(0, len(binary_data), 8)]
+    message = ''
+    for byte in bytes_data:
+        if byte == '11111110':
+            break
+        message += chr(int(byte, 2))
+    return message
 
 def run(log_history):
-    st.subheader("🖼️ LSB Steganography")
-    mode = st.radio("Pilih Mode", ("Sisipkan Pesan", "Ekstrak Pesan"))
+    st.subheader("🔏 LSB Steganography")
+    mode = st.radio("Mode", ["Enkripsi", "Dekripsi"])
 
-    if mode == "Sisipkan Pesan":
-        uploaded_image = st.file_uploader("Unggah Gambar PNG", type=["png"])
-        secret_message = st.text_area("Masukkan Pesan Rahasia")
-        if st.button("Sisipkan"):
-            if uploaded_image and secret_message:
-                with open("temp_input.png", "wb") as f:
-                    f.write(uploaded_image.read())
-                try:
-                    embed_lsb(secret_message, "temp_input.png", "temp_output.png")
-                    with open("temp_output.png", "rb") as f:
-                        st.download_button("Unduh Gambar Stego", f, file_name="gambar_tersembunyi.png")
-                    st.success("✅ Pesan berhasil disisipkan.")
-                    log_history("LSB Steganography", "Sisipkan", secret_message, "[Gambar]")
-                except Exception as e:
-                    st.error(f"❌ Terjadi kesalahan: {e}")
+    if mode == "Enkripsi":
+        uploaded = st.file_uploader("Unggah gambar (PNG)", type=["png"])
+        message = st.text_area("Pesan yang akan disisipkan")
 
-    elif mode == "Ekstrak Pesan":
-        uploaded_image = st.file_uploader("Unggah Gambar PNG", type=["png"])
-        if st.button("Ekstrak"):
-            if uploaded_image:
-                with open("temp_extract.png", "wb") as f:
-                    f.write(uploaded_image.read())
-                try:
-                    extracted = extract_lsb("temp_extract.png")
-                    st.text_area("Pesan Tersembunyi", value=extracted, height=150)
-                    log_history("LSB Steganography", "Ekstrak", "[Gambar]", extracted)
-                except Exception as e:
-                    st.error(f"❌ Gagal mengekstrak: {e}")
+        if uploaded and message:
+            image = Image.open(uploaded)
+            result_image = encode_lsb(image, message)
+            buf = io.BytesIO()
+            result_image.save(buf, format="PNG")
+            byte_im = buf.getvalue()
+
+            st.image(result_image, caption="Hasil Enkripsi")
+            st.download_button("📥 Unduh Gambar Terenkripsi", byte_im, file_name="stego_image.png", mime="image/png")
+            log_history("LSB Steganography", "Enkripsi", f"[Gambar] + {message}", "Gambar terenkripsi")
+    
+    elif mode == "Dekripsi":
+        uploaded = st.file_uploader("Unggah gambar terenkripsi (PNG)", type=["png"])
+        if uploaded:
+            image = Image.open(uploaded)
+            decoded_message = decode_lsb(image)
+            st.text_area("Pesan Tersembunyi", decoded_message)
+            log_history("LSB Steganography", "Dekripsi", "[Gambar terenkripsi]", decoded_message)
