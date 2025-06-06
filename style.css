@@ -1,56 +1,62 @@
 /* Warna latar belakang seluruh halaman */
 body {
-    background-color: #b2dfdb; /* hijau tosca */
+    background-color: #a7d8c9 !important;  /* hijau tosca muda */
 }
 
-/* Warna latar belakang sidebar dan container utama */
+/* Warna latar belakang sidebar */
 [data-testid="stSidebar"] {
-    background-color: #80cbc4; /* hijau tosca lebih gelap */
+    background-color: #4db6ac !important; /* hijau tosca medium */
+}
+
+/* Warna latar belakang container utama */
+[data-testid="stAppViewContainer"] {
+    background-color: #e0f2f1 !important; /* hijau tosca sangat terang */
 }
 
 /* Header dan teks utama */
-h1, h2, h3, h4, h5, h6, p {
-    color: #004d40; /* hijau tosca tua */
+h1, h2, h3, h4, h5, h6, p, label {
+    color: #00796b !important; /* hijau tosca tua */
 }
 
 /* Tombol utama */
 .stButton > button {
-    background-color: #26a69a;
-    color: white;
-    border-radius: 8px;
-    border: none;
-    font-weight: bold;
-    padding: 0.5em 1em;
+    background-color: #00897b !important;
+    color: white !important;
+    border-radius: 8px !important;
+    border: none !important;
+    font-weight: bold !important;
+    padding: 0.5em 1em !important;
 }
 
 .stButton > button:hover {
-    background-color: #00796b;
+    background-color: #004d40 !important;
 }
 
-/* Box hasil sukses (warna hijau terang) */
+/* Kotak alert sukses (hasil) */
 .stAlert > div {
     background-color: #b2dfdb !important;
     color: #004d40 !important;
 }
 
-/* Riwayat kotak */
+/* Kotak riwayat */
 div[data-testid="stExpander"] > div > div {
-    background-color: #e0f2f1 !important;
-    border-radius: 10px;
+    background-color: #b2dfdb !important;
+    border-radius: 10px !important;
 }
 
-/* Input teks dan select */
+/* Input teks, textarea, dan number input */
 input, textarea, .stTextInput > div > div, .stTextArea > div > div, .stNumberInput > div > div {
-    background-color: #e0f2f1;
-    border-radius: 5px;
+    background-color: #e0f2f1 !important;
+    border-radius: 5px !important;
+    color: #004d40 !important;
 }
 
 /* Label dan radio button */
 .stRadio > label, .stSelectbox > label {
-    color: #004d40;
+    color: #004d40 !important;
 }
 
 /* Footer */
 footer {
-    visibility: hidden;
+    visibility: hidden !important;
 }
