@@ -1,4 +1,6 @@
 import streamlit as st
+from utils import log_history
+
 
 def encrypt(text, rails):
     fence = [['' for _ in range(len(text))] for _ in range(rails)]
