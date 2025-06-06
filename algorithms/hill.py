@@ -1,54 +1,70 @@
 import streamlit as st
-from utils import log_history
 import numpy as np
 
-def mod_inverse(a, m):
-    for i in range(1, m):
-        if (a * i) % m == 1:
-            return i
-    return None
+def mod26_inv(matrix):
+    det = int(round(np.linalg.det(matrix))) % 26
+    det_inv = None
+    for i in range(26):
+        if (det * i) % 26 == 1:
+            det_inv = i
+            break
+    if det_inv is None:
+        return None
+    matrix_mod_inv = (det_inv * np.round(det * np.linalg.inv(matrix)).astype(int)) % 26
+    return matrix_mod_inv
 
-def encrypt(text, matrix):
+def process_text(text):
     text = text.upper().replace(" ", "")
     while len(text) % 2 != 0:
         text += "X"
+    return text
 
-    result = ""
-    for i in range(0, len(text), 2):
-        pair = [ord(text[i]) - 65, ord(text[i+1]) - 65]
-        res = np.dot(matrix, pair) % 26
-        result += chr(res[0] + 65) + chr(res[1] + 65)
-    return result
+def text_to_matrix(text):
+    return np.array([ord(c) - 65 for c in text]).reshape(-1, 2).T
 
-def decrypt(text, matrix):
-    det = int(np.round(np.linalg.det(matrix))) % 26
-    inv_det = mod_inverse(det, 26)
-    if inv_det is None:
-        return "Matriks tidak memiliki invers modulo 26"
+def matrix_to_text(matrix):
+    return "".join([chr(int(c) + 65) for c in matrix.T.flatten()])
 
-    adj = np.round(np.linalg.inv(matrix) * det).astype(int)
-    inv_matrix = (inv_det * adj) % 26
+def hill_encrypt(text, key_matrix):
+    text = process_text(text)
+    text_matrix = text_to_matrix(text)
+    encrypted_matrix = (key_matrix.dot(text_matrix)) % 26
+    return matrix_to_text(encrypted_matrix)
 
-    result = ""
-    for i in range(0, len(text), 2):
-        pair = [ord(text[i]) - 65, ord(text[i+1]) - 65]
-        res = np.dot(inv_matrix, pair) % 26
-        result += chr(res[0] + 65) + chr(res[1] + 65)
-    return result
+def hill_decrypt(text, key_matrix):
+    inv_key = mod26_inv(key_matrix)
+    if inv_key is None:
+        return None
+    text_matrix = text_to_matrix(text)
+    decrypted_matrix = (inv_key.dot(text_matrix)) % 26
+    return matrix_to_text(decrypted_matrix)
 
-def run():
+def run(log_history):
     st.header("🔐 Hill Cipher")
     mode = st.radio("Pilih mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("Masukkan teks (jumlah huruf genap)")
-    
-    m11 = st.number_input("Matriks M[0][0]", value=3)
-    m12 = st.number_input("Matriks M[0][1]", value=3)
-    m21 = st.number_input("Matriks M[1][0]", value=2)
-    m22 = st.number_input("Matriks M[1][1]", value=5)
-    
-    matrix = np.array([[m11, m12], [m21, m22]])
+    text = st.text_input("Masukkan teks")
+    key_input = st.text_input("Masukkan kunci matriks 2x2 (pisah dengan koma, misal: 3,3,2,5)")
 
     if st.button("Proses"):
-        result = encrypt(text, matrix) if mode == "Enkripsi" else decrypt(text, matrix)
+        try:
+            key_list = list(map(int, key_input.split(',')))
+            if len(key_list) != 4:
+                st.error("Kunci harus berisi 4 angka dipisah koma.")
+                return
+            key_matrix = np.array(key_list).reshape(2, 2)
+        except:
+            st.error("Format kunci salah.")
+            return
+
+        if mode == "Enkripsi":
+            result = hill_encrypt(text, key_matrix)
+            if result is None:
+                st.error("Kunci matriks tidak invertible modulo 26.")
+                return
+        else:
+            result = hill_decrypt(text, key_matrix)
+            if result is None:
+                st.error("Kunci matriks tidak invertible modulo 26.")
+                return
         st.success(f"Hasil: {result}")
         log_history("Hill Cipher", mode, text, result)
