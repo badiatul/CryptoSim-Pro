@@ -1,12 +1,25 @@
+/* Atur latar belakang aplikasi agar hijau */
 body {
-    background-color: #e8f5e9;
+    background-color: #c8facc; /* Hijau lembut */
+    color: black; /* Warna teks tetap hitam */
 }
-.css-1d391kg {
-    background-color: #a5d6a7 !important;
+
+/* Warna latar belakang utama konten */
+[data-testid="stAppViewContainer"] {
+    background-color: #c8facc; /* Hijau lembut */
 }
+
+/* Warna sidebar (opsional) */
+[data-testid="stSidebar"] {
+    background-color: #b2fab4;
+}
+
+/* Hapus atau ubah warna komponen lain jika perlu */
 h1, h2, h3, h4, h5, h6, p {
-    color: #2e7d32;
+    color: black; /* Teks tetap hitam */
 }
+
+/* Tombol */
 .stButton > button {
     background-color: #66bb6a;
     color: white;
