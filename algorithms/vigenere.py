@@ -59,3 +59,4 @@ def run():
             "hasil": hasil,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
+log_history("Vigenere Cipher", mode, text, result)
