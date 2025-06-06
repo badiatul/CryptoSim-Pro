@@ -1,6 +1,6 @@
 import streamlit as st
 import datetime
-from algorithms import caesar, vigenere, railfence, playfair, hill, beaufort, columnar
+from algorithms import caesar, vigenere, railfence, playfair, hill, beaufort, columnar, lsb
 
 st.set_page_config(page_title="CryptoSim Pro", layout="centered", page_icon="🛡️")
 
@@ -24,7 +24,7 @@ def log_history(alg, mode, input_text, result):
     })
 
 # Sidebar pilih algoritma
-menu = ["Caesar Cipher", "Vigenère Cipher", "Rail Fence Cipher", "Playfair Cipher", "Hill Cipher", "Beaufort Cipher", "Columnar Transposition Cipher"]
+menu = ["Caesar Cipher", "Vigenère Cipher", "Rail Fence Cipher", "Playfair Cipher", "Hill Cipher", "Beaufort Cipher", "Columnar Transposition Cipher", "LSB Steganography"]
 choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
 print("DAFTAR MENU:", menu)
 
@@ -44,7 +44,9 @@ elif choice == "Beaufort Cipher":
 elif choice == "Columnar Transposition Cipher":
     print("Columnar dipanggil")
     columnar.run(log_history)
-
+elif choice == "LSB Steganography":
+    lsb.run(log_history)
+    
 # Riwayat
 with st.expander("🕘 Lihat Riwayat"):
     if st.session_state.history:
