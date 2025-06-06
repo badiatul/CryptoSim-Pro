@@ -1,31 +1,56 @@
-/* Atur latar belakang aplikasi agar hijau */
+/* Warna latar belakang seluruh halaman */
 body {
-    background-color: #c8facc; /* Hijau lembut */
-    color: black; /* Warna teks tetap hitam */
+    background-color: #b2dfdb; /* hijau tosca */
 }
 
-/* Warna latar belakang utama konten */
-[data-testid="stAppViewContainer"] {
-    background-color: #c8facc; /* Hijau lembut */
-}
-
-/* Warna sidebar (opsional) */
+/* Warna latar belakang sidebar dan container utama */
 [data-testid="stSidebar"] {
-    background-color: #b2fab4;
+    background-color: #80cbc4; /* hijau tosca lebih gelap */
 }
 
-/* Hapus atau ubah warna komponen lain jika perlu */
+/* Header dan teks utama */
 h1, h2, h3, h4, h5, h6, p {
-    color: black; /* Teks tetap hitam */
+    color: #004d40; /* hijau tosca tua */
 }
 
-/* Tombol */
+/* Tombol utama */
 .stButton > button {
-    background-color: #66bb6a;
+    background-color: #26a69a;
     color: white;
     border-radius: 8px;
     border: none;
+    font-weight: bold;
+    padding: 0.5em 1em;
 }
+
 .stButton > button:hover {
-    background-color: #388e3c;
+    background-color: #00796b;
+}
+
+/* Box hasil sukses (warna hijau terang) */
+.stAlert > div {
+    background-color: #b2dfdb !important;
+    color: #004d40 !important;
+}
+
+/* Riwayat kotak */
+div[data-testid="stExpander"] > div > div {
+    background-color: #e0f2f1 !important;
+    border-radius: 10px;
+}
+
+/* Input teks dan select */
+input, textarea, .stTextInput > div > div, .stTextArea > div > div, .stNumberInput > div > div {
+    background-color: #e0f2f1;
+    border-radius: 5px;
+}
+
+/* Label dan radio button */
+.stRadio > label, .stSelectbox > label {
+    color: #004d40;
+}
+
+/* Footer */
+footer {
+    visibility: hidden;
 }
