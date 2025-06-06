@@ -34,3 +34,26 @@ def run():
     if st.button("Proses") and key.isalpha():
         result = vigenere_encrypt(text, key) if mode == "Enkripsi" else vigenere_decrypt(text, key)
         st.success(f"Hasil: {result}")
+def run():
+    import streamlit as st
+    from datetime import datetime
+    from .cipher_utils import vigenere_encrypt as encrypt, vigenere_decrypt as decrypt
+
+    mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
+    teks = st.text_area("Masukkan Teks")
+    key = st.text_input("Masukkan Kunci (kata)")
+
+    if st.button("🔐 Proses"):
+        if mode == "Enkripsi":
+            hasil = encrypt(teks, key)
+        else:
+            hasil = decrypt(teks, key)
+        st.success(hasil)
+
+        st.session_state.history.append({
+            "algoritma": "Vigenère Cipher",
+            "mode": mode,
+            "input": teks,
+            "hasil": hasil,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        })
