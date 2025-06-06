@@ -1,46 +1,35 @@
 # algorithms/columnar.py
 import streamlit as st
 
-def encrypt(plaintext, key):
-    key_order = sorted(range(len(key)), key=lambda k: key[k])
-    columns = ['' for _ in range(len(key))]
-    for i, char in enumerate(plaintext):
-        columns[i % len(key)] += char
-    ciphertext = ''.join([columns[i] for i in key_order])
-    return ciphertext
+def encrypt(text, key):
+    num_cols = len(key)
+    num_rows = (len(text) + num_cols - 1) // num_cols
+    padded_text = text.ljust(num_rows * num_cols)
+    table = [padded_text[i::num_rows] for i in range(num_rows)]
+    sorted_key = sorted([(k, i) for i, k in enumerate(key)])
+    return ''.join([table[i][j] for k, i in sorted_key for j in range(num_rows)])
 
 def decrypt(ciphertext, key):
-    key_order = sorted(range(len(key)), key=lambda k: key[k])
-    n_rows = len(ciphertext) // len(key)
-    n_extra = len(ciphertext) % len(key)
-    
-    columns = ['' for _ in range(len(key))]
-    pos = 0
-    for i in range(len(key)):
-        col_len = n_rows + (1 if key_order.index(i) < n_extra else 0)
-        columns[i] = ciphertext[pos:pos + col_len]
-        pos += col_len
-
-    plaintext = ''
-    for i in range(n_rows + 1):
-        for j in key_order:
-            if i < len(columns[j]):
-                plaintext += columns[j][i]
-    return plaintext
+    num_cols = len(key)
+    num_rows = (len(ciphertext) + num_cols - 1) // num_cols
+    sorted_key = sorted([(k, i) for i, k in enumerate(key)])
+    columns = [''] * num_cols
+    idx = 0
+    for k, i in sorted_key:
+        columns[i] = ciphertext[idx:idx + num_rows]
+        idx += num_rows
+    return ''.join(''.join(row) for row in zip(*columns)).strip()
 
 def run(log_history):
-    st.subheader("🔐 Columnar Transposition Cipher")
+    st.subheader("📤 Columnar Transposition Cipher")
     mode = st.radio("Mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("Masukkan teks (tanpa spasi)")
-    key = st.text_input("Masukkan kunci (huruf saja)")
+    text = st.text_area("Masukkan teks")
+    key = st.text_input("Masukkan kunci")
 
     if st.button("Proses"):
-        if not key.isalpha():
-            st.error("Kunci harus berupa huruf.")
+        if not key:
+            st.error("Kunci tidak boleh kosong.")
             return
-        if mode == "Enkripsi":
-            result = encrypt(text.replace(" ", ""), key.upper())
-        else:
-            result = decrypt(text.replace(" ", ""), key.upper())
+        result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
         st.success(result)
         log_history("Columnar Transposition Cipher", mode, text, result)
