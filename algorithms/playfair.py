@@ -1,18 +1,28 @@
+```python
 import streamlit as st
+from datetime import datetime
 
 def create_matrix(key):
+    key = "".join(sorted(set(key.upper().replace("J", "I")), key=lambda x: key.index(x)))
     alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"
-    key = key.upper().replace("J", "I")
-    seen = set()
     matrix = []
-    for char in key + alphabet:
-        if char not in seen:
-            seen.add(char)
-            matrix.append(char)
+    for c in key:
+        if c not in matrix:
+            matrix.append(c)
+    for c in alphabet:
+        if c not in matrix:
+            matrix.append(c)
     return [matrix[i:i+5] for i in range(0, 25, 5)]
 
+def find_position(matrix, char):
+    for i, row in enumerate(matrix):
+        for j, c in enumerate(row):
+            if c == char:
+                return i, j
+    return None, None
+
 def process_text(text):
-    text = text.upper().replace("J", "I")
+    text = text.upper().replace("J", "I").replace(" ", "")
     processed = ""
     i = 0
     while i < len(text):
@@ -28,49 +38,44 @@ def process_text(text):
         processed += "X"
     return processed
 
-def find_position(matrix, char):
-    for i in range(5):
-        for j in range(5):
-            if matrix[i][j] == char:
-                return i, j
-
-def playfair_encrypt(text, key):
+def encrypt(text, key):
     matrix = create_matrix(key)
     text = process_text(text)
     result = ""
     for i in range(0, len(text), 2):
         a, b = text[i], text[i+1]
-        ax, ay = find_position(matrix, a)
-        bx, by = find_position(matrix, b)
-        if ax == bx:
-            result += matrix[ax][(ay+1)%5] + matrix[bx][(by+1)%5]
-        elif ay == by:
-            result += matrix[(ax+1)%5][ay] + matrix[(bx+1)%5][by]
+        row1, col1 = find_position(matrix, a)
+        row2, col2 = find_position(matrix, b)
+        if row1 == row2:
+            result += matrix[row1][(col1+1)%5] + matrix[row2][(col2+1)%5]
+        elif col1 == col2:
+            result += matrix[(row1+1)%5][col1] + matrix[(row2+1)%5][col2]
         else:
-            result += matrix[ax][by] + matrix[bx][ay]
+            result += matrix[row1][col2] + matrix[row2][col1]
     return result
 
-def playfair_decrypt(text, key):
+def decrypt(text, key):
     matrix = create_matrix(key)
     result = ""
     for i in range(0, len(text), 2):
         a, b = text[i], text[i+1]
-        ax, ay = find_position(matrix, a)
-        bx, by = find_position(matrix, b)
-        if ax == bx:
-            result += matrix[ax][(ay-1)%5] + matrix[bx][(by-1)%5]
-        elif ay == by:
-            result += matrix[(ax-1)%5][ay] + matrix[(bx-1)%5][by]
+        row1, col1 = find_position(matrix, a)
+        row2, col2 = find_position(matrix, b)
+        if row1 == row2:
+            result += matrix[row1][(col1-1)%5] + matrix[row2][(col2-1)%5]
+        elif col1 == col2:
+            result += matrix[(row1-1)%5][col1] + matrix[(row2-1)%5][col2]
         else:
-            result += matrix[ax][by] + matrix[bx][ay]
+            result += matrix[row1][col2] + matrix[row2][col1]
     return result
 
 def run(log_history):
     st.header("🔐 Playfair Cipher")
     mode = st.radio("Pilih mode", ["Enkripsi", "Dekripsi"])
     text = st.text_input("Masukkan teks")
-    key = st.text_input("Masukkan kunci")
-    if st.button("Proses"):
-        result = playfair_encrypt(text, key) if mode == "Enkripsi" else playfair_decrypt(text, key)
+    key = st.text_input("Masukkan kunci (huruf)")
+    if st.button("Proses") and key.isalpha():
+        result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
         st.success(f"Hasil: {result}")
         log_history("Playfair Cipher", mode, text, result)
+```
