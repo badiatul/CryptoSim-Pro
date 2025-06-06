@@ -1,5 +1,7 @@
 import streamlit as st
 from datetime import datetime
+from utils import log_history
+
 
 def create_matrix(key):
     # Hapus duplikat dan ubah ke uppercase, ganti J dengan I
