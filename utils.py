@@ -12,3 +12,4 @@ def log_history(alg, mode, input_text, result):
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     })
     st.session_state["last_result"] = result
+
