@@ -1,16 +1,21 @@
 import streamlit as st
 
 def create_matrix(key):
-    key = "".join(sorted(set(key.upper().replace("J", "I")), key=lambda x: key.index(x)))
-    alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"
-    matrix = []
+    key = key.upper().replace("J", "I")
+    seen = set()
+    new_key = ""
     for c in key:
-        if c not in matrix:
-            matrix.append(c)
+        if c.isalpha() and c not in seen:
+            seen.add(c)
+            new_key += c
+
+    alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"
     for c in alphabet:
-        if c not in matrix:
-            matrix.append(c)
-    return [matrix[i:i+5] for i in range(0, 25, 5)]
+        if c not in seen:
+            new_key += c
+
+    matrix = [list(new_key[i:i+5]) for i in range(0, 25, 5)]
+    return matrix
 
 def find_position(matrix, char):
     for i, row in enumerate(matrix):
@@ -21,20 +26,20 @@ def find_position(matrix, char):
 
 def process_text(text):
     text = text.upper().replace("J", "I").replace(" ", "")
-    processed = ""
+    result = ""
     i = 0
     while i < len(text):
         a = text[i]
         b = text[i+1] if i+1 < len(text) else "X"
         if a == b:
-            processed += a + "X"
+            result += a + "X"
             i += 1
         else:
-            processed += a + b
+            result += a + b
             i += 2
-    if len(processed) % 2 != 0:
-        processed += "X"
-    return processed
+    if len(result) % 2 != 0:
+        result += "X"
+    return result
 
 def playfair_encrypt(text, key):
     matrix = create_matrix(key)
