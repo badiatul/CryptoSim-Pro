@@ -81,3 +81,4 @@ def run():
             "hasil": hasil,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         })
+log_history("Hill Cipher", mode, text, result)
