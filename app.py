@@ -26,6 +26,7 @@ def log_history(alg, mode, input_text, result):
 # Sidebar pilih algoritma
 menu = ["Caesar Cipher", "Vigenère Cipher", "Rail Fence Cipher", "Playfair Cipher", "Hill Cipher", "Beaufort Cipher"]
 choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
+print("DAFTAR MENU:", menu)
 
 # Jalankan algoritma sesuai pilihan
 if choice == "Caesar Cipher":
