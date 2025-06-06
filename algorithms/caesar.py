@@ -1,4 +1,6 @@
+```python
 import streamlit as st
+from datetime import datetime
 
 def encrypt(text, shift):
     result = ""
@@ -14,7 +16,7 @@ def decrypt(text, shift):
     return encrypt(text, -shift)
 
 def run(log_history):
-    st.header("\U0001F510 Caesar Cipher")
+    st.header("🔐 Caesar Cipher")
     mode = st.radio("Pilih mode", ["Enkripsi", "Dekripsi"])
     text = st.text_input("Masukkan teks")
     shift = st.slider("Pergeseran (Shift)", 1, 25, 3)
@@ -22,3 +24,4 @@ def run(log_history):
         result = encrypt(text, shift) if mode == "Enkripsi" else decrypt(text, shift)
         st.success(f"Hasil: {result}")
         log_history("Caesar Cipher", mode, text, result)
+```
