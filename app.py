@@ -69,5 +69,45 @@ with st.expander("⬇️ Unduh Hasil Enkripsi/Dekripsi"):
         st.warning("Belum ada hasil yang bisa diunduh.")
 
 st.markdown("<p style='text-align: center; color: grey;'>© 2025 CryptoSim Pro 💚</p>", unsafe_allow_html=True)
-with open("style.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+st.markdown("""
+<style>
+body {
+    background-color: #e0f2f1;
+}
+[data-testid="stSidebar"] {
+    background-color: #b2dfdb;
+}
+h1, h2, h3, h4, h5, h6, p {
+    color: #004d40;
+}
+.stButton > button {
+    background-color: #26a69a;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    padding: 0.5em 1em;
+}
+.stButton > button:hover {
+    background-color: #00796b;
+}
+.stAlert > div {
+    background-color: #b2dfdb !important;
+    color: #004d40 !important;
+}
+div[data-testid="stExpander"] > div > div {
+    background-color: #e0f2f1 !important;
+    border-radius: 10px;
+}
+input, textarea, .stTextInput > div > div, .stTextArea > div > div, .stNumberInput > div > div {
+    background-color: #f1f8e9;
+    border-radius: 5px;
+}
+.stRadio > label, .stSelectbox > label {
+    color: #004d40;
+}
+footer {
+    visibility: hidden;
+}
+</style>
+""", unsafe_allow_html=True)
