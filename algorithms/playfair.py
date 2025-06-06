@@ -1,81 +1,62 @@
-```python
 import streamlit as st
-from datetime import datetime
 
-def create_matrix(key):
-    key = "".join(sorted(set(key.upper().replace("J", "I")), key=lambda x: key.index(x)))
-    alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"
-    matrix = []
-    for c in key:
-        if c not in matrix:
-            matrix.append(c)
-    for c in alphabet:
-        if c not in matrix:
-            matrix.append(c)
-    return [matrix[i:i+5] for i in range(0, 25, 5)]
-
-def find_position(matrix, char):
-    for i, row in enumerate(matrix):
-        for j, c in enumerate(row):
-            if c == char:
-                return i, j
-    return None, None
-
-def process_text(text):
-    text = text.upper().replace("J", "I").replace(" ", "")
-    processed = ""
+def prepare_input(text):
+    text = text.upper().replace('J', 'I')
+    prepared = ''
     i = 0
     while i < len(text):
         a = text[i]
-        b = text[i+1] if i+1 < len(text) else "X"
+        b = text[i+1] if i+1 < len(text) else 'X'
         if a == b:
-            processed += a + "X"
+            prepared += a + 'X'
             i += 1
         else:
-            processed += a + b
+            prepared += a + b
             i += 2
-    if len(processed) % 2 != 0:
-        processed += "X"
-    return processed
+    if len(prepared) % 2 != 0:
+        prepared += 'X'
+    return prepared
 
-def encrypt(text, key):
-    matrix = create_matrix(key)
-    text = process_text(text)
-    result = ""
-    for i in range(0, len(text), 2):
-        a, b = text[i], text[i+1]
-        row1, col1 = find_position(matrix, a)
-        row2, col2 = find_position(matrix, b)
-        if row1 == row2:
-            result += matrix[row1][(col1+1)%5] + matrix[row2][(col2+1)%5]
-        elif col1 == col2:
-            result += matrix[(row1+1)%5][col1] + matrix[(row2+1)%5][col2]
-        else:
-            result += matrix[row1][col2] + matrix[row2][col1]
-    return result
+def create_matrix(key):
+    key = key.upper().replace('J', 'I')
+    seen = set()
+    matrix = []
+    for char in key + 'ABCDEFGHIKLMNOPQRSTUVWXYZ':
+        if char not in seen:
+            seen.add(char)
+            matrix.append(char)
+    return [matrix[i:i+5] for i in range(0, 25, 5)]
 
-def decrypt(text, key):
+def find_pos(matrix, char):
+    for i, row in enumerate(matrix):
+        if char in row:
+            return i, row.index(char)
+
+def process_pair(a, b, matrix, mode):
+    ax, ay = find_pos(matrix, a)
+    bx, by = find_pos(matrix, b)
+    if ax == bx:
+        return (matrix[ax][(ay+1)%5], matrix[bx][(by+1)%5]) if mode == 'Enkripsi' else (matrix[ax][(ay-1)%5], matrix[bx][(by-1)%5])
+    elif ay == by:
+        return (matrix[(ax+1)%5][ay], matrix[(bx+1)%5][by]) if mode == 'Enkripsi' else (matrix[(ax-1)%5][ay], matrix[(bx-1)%5][by])
+    else:
+        return matrix[ax][by], matrix[bx][ay]
+
+def cipher(text, key, mode):
     matrix = create_matrix(key)
-    result = ""
+    text = prepare_input(text)
+    result = ''
     for i in range(0, len(text), 2):
-        a, b = text[i], text[i+1]
-        row1, col1 = find_position(matrix, a)
-        row2, col2 = find_position(matrix, b)
-        if row1 == row2:
-            result += matrix[row1][(col1-1)%5] + matrix[row2][(col2-1)%5]
-        elif col1 == col2:
-            result += matrix[(row1-1)%5][col1] + matrix[(row2-1)%5][col2]
-        else:
-            result += matrix[row1][col2] + matrix[row2][col1]
+        a, b = process_pair(text[i], text[i+1], matrix, mode)
+        result += a + b
     return result
 
 def run(log_history):
-    st.header("🔐 Playfair Cipher")
-    mode = st.radio("Pilih mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_input("Masukkan teks")
-    key = st.text_input("Masukkan kunci (huruf)")
-    if st.button("Proses") and key.isalpha():
-        result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
-        st.success(f"Hasil: {result}")
+    st.subheader("🔐 Playfair Cipher")
+    mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
+    text = st.text_area("Masukkan Teks")
+    key = st.text_input("Masukkan Kunci")
+    if st.button("Proses") and key:
+        result = cipher(text, key, mode)
+        st.success(result)
         log_history("Playfair Cipher", mode, text, result)
-```
