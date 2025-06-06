@@ -1,0 +1,18 @@
+body {
+    background-color: #e8f5e9;
+}
+.css-1d391kg {
+    background-color: #a5d6a7 !important;
+}
+h1, h2, h3, h4, h5, h6, p {
+    color: #2e7d32;
+}
+.stButton > button {
+    background-color: #66bb6a;
+    color: white;
+    border-radius: 8px;
+    border: none;
+}
+.stButton > button:hover {
+    background-color: #388e3c;
+}
