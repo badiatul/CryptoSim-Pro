@@ -1,21 +1,21 @@
-/* Warna latar belakang seluruh halaman */
+/* Warna latar belakang halaman utama */
 body {
-    background-color: #a7d8c9 !important;  /* hijau tosca muda */
+    background-color: #a7d8c9 !important;
 }
 
 /* Warna latar belakang sidebar */
 [data-testid="stSidebar"] {
-    background-color: #4db6ac !important; /* hijau tosca medium */
+    background-color: #4db6ac !important;
 }
 
-/* Warna latar belakang container utama */
+/* Container utama Streamlit */
 [data-testid="stAppViewContainer"] {
-    background-color: #e0f2f1 !important; /* hijau tosca sangat terang */
+    background-color: #e0f2f1 !important;
 }
 
 /* Header dan teks utama */
 h1, h2, h3, h4, h5, h6, p, label {
-    color: #00796b !important; /* hijau tosca tua */
+    color: #00796b !important;
 }
 
 /* Tombol utama */
@@ -32,31 +32,31 @@ h1, h2, h3, h4, h5, h6, p, label {
     background-color: #004d40 !important;
 }
 
-/* Kotak alert sukses (hasil) */
+/* Kotak alert */
 .stAlert > div {
     background-color: #b2dfdb !important;
     color: #004d40 !important;
 }
 
-/* Kotak riwayat */
+/* Kotak di riwayat */
 div[data-testid="stExpander"] > div > div {
     background-color: #b2dfdb !important;
     border-radius: 10px !important;
 }
 
-/* Input teks, textarea, dan number input */
+/* Input dan textarea */
 input, textarea, .stTextInput > div > div, .stTextArea > div > div, .stNumberInput > div > div {
     background-color: #e0f2f1 !important;
     border-radius: 5px !important;
     color: #004d40 !important;
 }
 
-/* Label dan radio button */
+/* Label dan radio */
 .stRadio > label, .stSelectbox > label {
     color: #004d40 !important;
 }
 
-/* Footer */
+/* Sembunyikan footer */
 footer {
     visibility: hidden !important;
 }
