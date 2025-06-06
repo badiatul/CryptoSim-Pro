@@ -1,5 +1,4 @@
 import streamlit as st
-from utils import log_history
 
 def create_matrix(key):
     key = "".join(sorted(set(key.upper().replace("J", "I")), key=lambda x: key.index(x)))
@@ -37,7 +36,7 @@ def process_text(text):
         processed += "X"
     return processed
 
-def encrypt(text, key):
+def playfair_encrypt(text, key):
     matrix = create_matrix(key)
     text = process_text(text)
     result = ""
@@ -53,7 +52,7 @@ def encrypt(text, key):
             result += matrix[row1][col2] + matrix[row2][col1]
     return result
 
-def decrypt(text, key):
+def playfair_decrypt(text, key):
     matrix = create_matrix(key)
     result = ""
     for i in range(0, len(text), 2):
@@ -68,13 +67,16 @@ def decrypt(text, key):
             result += matrix[row1][col2] + matrix[row2][col1]
     return result
 
-def run():
+def run(log_history):
     st.header("🔐 Playfair Cipher")
     mode = st.radio("Pilih mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("Masukkan teks")
+    text = st.text_input("Masukkan teks")
     key = st.text_input("Masukkan kunci (huruf)")
 
-    if st.button("Proses") and key.isalpha():
-        result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
+    if st.button("Proses") and key.isalpha() and key != "":
+        if mode == "Enkripsi":
+            result = playfair_encrypt(text, key)
+        else:
+            result = playfair_decrypt(text, key)
         st.success(f"Hasil: {result}")
         log_history("Playfair Cipher", mode, text, result)
