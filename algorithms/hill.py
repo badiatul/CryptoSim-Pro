@@ -1,5 +1,7 @@
 import streamlit as st
 import numpy as np
+from utils import log_history
+
 
 def mod_inverse(a, m):
     for x in range(1, m):
