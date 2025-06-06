@@ -1,18 +1,17 @@
 import streamlit as st
-from datetime import datetime
 from utils import log_history
 
-
 def create_matrix(key):
-    # Hapus duplikat dan ubah ke uppercase, ganti J dengan I
-    key = key.upper().replace("J", "I")
-    seen = set()
-    key_unique = "".join([c for c in key if c.isalpha() and not (c in seen or seen.add(c))])
-
+    key = "".join(sorted(set(key.upper().replace("J", "I")), key=lambda x: key.index(x)))
     alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ"
-    matrix_string = key_unique + "".join([c for c in alphabet if c not in key_unique])
-    matrix = [list(matrix_string[i:i+5]) for i in range(0, 25, 5)]
-    return matrix
+    matrix = []
+    for c in key:
+        if c not in matrix:
+            matrix.append(c)
+    for c in alphabet:
+        if c not in matrix:
+            matrix.append(c)
+    return [matrix[i:i+5] for i in range(0, 25, 5)]
 
 def find_position(matrix, char):
     for i, row in enumerate(matrix):
@@ -38,7 +37,7 @@ def process_text(text):
         processed += "X"
     return processed
 
-def playfair_encrypt(text, key):
+def encrypt(text, key):
     matrix = create_matrix(key)
     text = process_text(text)
     result = ""
@@ -54,7 +53,7 @@ def playfair_encrypt(text, key):
             result += matrix[row1][col2] + matrix[row2][col1]
     return result
 
-def playfair_decrypt(text, key):
+def decrypt(text, key):
     matrix = create_matrix(key)
     result = ""
     for i in range(0, len(text), 2):
@@ -71,31 +70,11 @@ def playfair_decrypt(text, key):
 
 def run():
     st.header("🔐 Playfair Cipher")
-    mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
-    teks = st.text_area("Masukkan Teks")
-    key = st.text_input("Masukkan Kunci (huruf saja)")
+    mode = st.radio("Pilih mode", ["Enkripsi", "Dekripsi"])
+    text = st.text_area("Masukkan teks")
+    key = st.text_input("Masukkan kunci (huruf)")
 
-    if st.button("🔐 Proses"):
-        if not key.isalpha():
-            st.warning("Kunci hanya boleh terdiri dari huruf.")
-            return
-        try:
-            if mode == "Enkripsi":
-                hasil = playfair_encrypt(teks, key)
-            else:
-                hasil = playfair_decrypt(teks, key)
-
-            st.success(f"Hasil: {hasil}")
-
-            # Simpan ke riwayat
-            if "history" in st.session_state:
-                st.session_state.history.append({
-                    "algoritma": "Playfair Cipher",
-                    "mode": mode,
-                    "input": teks,
-                    "hasil": hasil,
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                })
-        except Exception as e:
-            st.error(f"Gagal memproses: {e}")
-log_history("Playfair Cipher", mode, text, result)
+    if st.button("Proses") and key.isalpha():
+        result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
+        st.success(f"Hasil: {result}")
+        log_history("Playfair Cipher", mode, text, result)
