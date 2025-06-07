@@ -95,7 +95,7 @@ with st.expander("⬇️ Unduh Hasil Enkripsi/Dekripsi"):
     else:
         st.warning("Belum ada hasil yang bisa diunduh.")
 
-st.markdown("<p style='text-align: center; color: grey;'>© 2025 CryptoSim Pro Badiatul</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: grey;'>© 2025 CryptoSim Pro by Badiatul</p>", unsafe_allow_html=True)
 st.markdown("""
 <style>
 body {
