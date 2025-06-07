@@ -5,7 +5,7 @@ from algorithms import caesar, vigenere, railfence, playfair, hill, beaufort, co
 st.set_page_config(page_title="CryptoSim Pro", layout="centered", page_icon="🛡️")
 
 st.markdown(
-    "<h1 style='text-align: center; color: green;'>CryptoSim Pro 🛡️</h1>",
+    "<h1 style='text-align: center; color: black;'>CryptoSim Pro 🛡️</h1>",
     unsafe_allow_html=True,
 )
 
