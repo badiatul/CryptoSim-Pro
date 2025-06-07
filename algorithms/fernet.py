@@ -1,76 +1,70 @@
 """
 Fernet Encryption/Decryption Module for CryptoSim Pro
-Menggunakan kunci simetris 32-byte base64.
-Tersedia fitur: generate otomatis, unggah kunci, salin & simpan kunci.
+Menggunakan kunci simetris 32-byte base64. Mendukung generate otomatis dan copy-paste manual.
 """
 
 import streamlit as st
 from cryptography.fernet import Fernet
-import base64
 
 def run(log_history):
     st.markdown("## 🔐 Fernet Encryption / Decryption")
-    
-    # Penjelasan singkat
-    with st.expander("📖 Penjelasan Tentang Kunci"):
-        st.markdown("""
-        - Fernet menggunakan **kunci simetris** (kunci yang sama untuk enkripsi dan dekripsi).
-        - Format kunci adalah **Base64**, terdiri dari 44 karakter.
-        - Kamu bisa membuat kunci otomatis atau mengunggah kunci dari file.
-        - **Simpan kunci baik-baik**, karena jika hilang, data tidak bisa didekripsi kembali.
-        """)
+
+    # Penjelasan selalu tampil
+    st.markdown("""
+    ### 📖 Penjelasan Tentang Kunci Fernet
+    - Fernet menggunakan **kunci simetris** (satu kunci yang sama untuk enkripsi dan dekripsi).
+    - Format kunci adalah **Base64**, panjangnya **44 karakter**.
+    - Kamu bisa **membuat kunci otomatis** atau **menempelkan kunci manual** (copy-paste).
+    - Simpan baik-baik kunci tersebut, karena **tanpa kunci yang sama, dekripsi tidak mungkin dilakukan**.
+    """)
 
     # Pilih mode
     mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
 
     if mode == "Enkripsi":
-        st.subheader("🧮 Generate Key")
+        st.subheader("🧮 Buat atau Masukkan Kunci")
         if st.button("🔑 Buat Kunci Baru Otomatis"):
             key = Fernet.generate_key()
-            st.session_state.fernet_key = key  # simpan untuk digunakan nanti
-            st.success(f"Kunci berhasil dibuat: `{key.decode()}`")
+            st.session_state.fernet_key = key.decode()
 
-            st.download_button(
-                label="📥 Unduh Kunci",
-                data=key,
-                file_name="fernet_key.key",
-                mime="application/octet-stream"
-            )
+        # Tampilkan kolom input manual
+        key_input = st.text_input("Masukkan atau tempel kunci (Base64)", value=st.session_state.get("fernet_key", ""))
 
-        if "fernet_key" in st.session_state:
-            key = st.session_state.fernet_key
-            fernet = Fernet(key)
+        plaintext = st.text_area("Masukkan teks yang akan dienkripsi")
 
-            plaintext = st.text_area("Masukkan teks yang akan dienkripsi")
-            if st.button("🔒 Enkripsi"):
-                if plaintext:
-                    token = fernet.encrypt(plaintext.encode()).decode()
-                    st.success(f"Hasil Enkripsi:\n\n{token}")
-                    log_history("Fernet", "Enkripsi", plaintext, token)
-                else:
-                    st.warning("Teks tidak boleh kosong.")
-        else:
-            st.info("Silakan buat kunci terlebih dahulu untuk memulai enkripsi.")
+        if st.button("🔒 Enkripsi"):
+            if not key_input or len(key_input) != 44:
+                st.error("Kunci tidak valid. Harus 44 karakter Base64.")
+                return
+            if not plaintext:
+                st.warning("Teks tidak boleh kosong.")
+                return
+            try:
+                fernet = Fernet(key_input.encode())
+                token = fernet.encrypt(plaintext.encode()).decode()
+                st.success(f"Hasil Enkripsi:\n\n{token}")
+                st.info("💾 Simpan kunci ini untuk proses dekripsi:")
+                st.code(key_input)
+                log_history("Fernet", "Enkripsi", plaintext, token)
+            except Exception as e:
+                st.error(f"Kesalahan enkripsi: {e}")
 
     else:  # Dekripsi
-        st.subheader("📤 Unggah Kunci")
-        uploaded_file = st.file_uploader("Unggah file kunci .key (base64)", type=["key"])
-        if uploaded_file:
-            key = uploaded_file.read()
+        st.subheader("🔐 Masukkan Kunci yang Pernah Digunakan untuk Enkripsi")
+        key_input = st.text_input("Tempelkan kunci (Base64)", "")
+        ciphertext = st.text_area("Tempelkan teks terenkripsi (token)")
+
+        if st.button("🔓 Dekripsi"):
+            if not key_input or len(key_input) != 44:
+                st.error("Kunci tidak valid. Harus 44 karakter Base64.")
+                return
+            if not ciphertext:
+                st.warning("Teks terenkripsi tidak boleh kosong.")
+                return
             try:
-                fernet = Fernet(key)
-                ciphertext = st.text_area("Masukkan teks terenkripsi (token)")
-                if st.button("🔓 Dekripsi"):
-                    if ciphertext:
-                        try:
-                            decrypted = fernet.decrypt(ciphertext.encode()).decode()
-                            st.success(f"Hasil Dekripsi:\n\n{decrypted}")
-                            log_history("Fernet", "Dekripsi", ciphertext, decrypted)
-                        except Exception as e:
-                            st.error(f"Gagal mendekripsi: {e}")
-                    else:
-                        st.warning("Teks terenkripsi tidak boleh kosong.")
-            except Exception:
-                st.error("Kunci tidak valid. Pastikan file yang diunggah adalah kunci Fernet base64 32-byte.")
-        else:
-            st.info("Silakan unggah file kunci yang valid untuk memulai dekripsi.")
+                fernet = Fernet(key_input.encode())
+                decrypted = fernet.decrypt(ciphertext.encode()).decode()
+                st.success(f"Hasil Dekripsi:\n\n{decrypted}")
+                log_history("Fernet", "Dekripsi", ciphertext, decrypted)
+            except Exception as e:
+                st.error(f"Kesalahan dekripsi: {e}")
