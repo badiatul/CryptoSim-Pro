@@ -24,7 +24,6 @@ def run(log_history):
     st.markdown("## 🔐 ECC Encryption / Decryption")
 
     st.info("""
-**🔎 Apa itu ECC (Elliptic Curve Cryptography)?**
 
 ECC adalah metode kriptografi modern yang menggunakan kurva eliptik untuk mengenkripsi dan mendekripsi data.
 
