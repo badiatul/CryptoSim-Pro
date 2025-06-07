@@ -51,6 +51,7 @@ if choice == "Beranda":
     📁 Anda juga dapat mengunggah file dan melihat riwayat penggunaan.  
     🛡️ Silakan pilih algoritma di sidebar untuk memulai simulasi.
     """)
+
 # Jalankan algoritma sesuai pilihan
 elif choice == "Caesar Cipher":
     caesar.run(log_history)
@@ -75,44 +76,47 @@ elif choice == "ChaCha20":
 elif choice == "Fernet":
     fernet.run(log_history)
 
-# Riwayat
-with st.expander("🕘 Lihat Riwayat"):
-    if st.session_state.history:
-        for item in reversed(st.session_state.history[-10:]):
-            st.markdown(f"""
-            <div style='background-color:#e6ffe6;padding:10px;border-radius:10px;margin-bottom:10px;'>
-                <strong>{item['timestamp']}</strong><br>
-                <em>{item['algoritma']}</em> ({item['mode']})<br>
-                <b>Input:</b> {item['input']}<br>
-                <b>Hasil:</b> {item['hasil']}
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        st.info("Belum ada riwayat.")
+# Tampilkan riwayat & unduhan hanya jika bukan di Beranda
+if choice != "Beranda":
+    with st.expander("🕘 Lihat Riwayat"):
+        if st.session_state.history:
+            for item in reversed(st.session_state.history[-10:]):
+                st.markdown(f"""
+                <div style='background-color:#e6ffe6;padding:10px;border-radius:10px;margin-bottom:10px;'>
+                    <strong>{item['timestamp']}</strong><br>
+                    <em>{item['algoritma']}</em> ({item['mode']})<br>
+                    <b>Input:</b> {item['input']}<br>
+                    <b>Hasil:</b> {item['hasil']}
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("Belum ada riwayat.")
 
-# Unduhan
-with st.expander("⬇️ Unduh Hasil Enkripsi/Dekripsi"):
-    if st.session_state.history:
-        last = st.session_state.history[-1]
-        filename = f"{last['algoritma'].replace(' ', '_')}_{last['mode'].lower()}_{datetime.datetime.now().strftime('%H%M%S')}.txt"
-        
-        data_to_download = last["hasil"]
-        if not isinstance(data_to_download, str):
-            try:
-                data_to_download = str(data_to_download)
-            except Exception:
-                data_to_download = "Tidak bisa menampilkan hasil dalam format teks."
-        
-        st.download_button(
-            label="📄 Unduh Hasil Terakhir",
-            data=data_to_download,
-            file_name=filename,
-            mime="text/plain"
-        )
-    else:
-        st.warning("Belum ada hasil yang bisa diunduh.")
+    with st.expander("⬇️ Unduh Hasil Enkripsi/Dekripsi"):
+        if st.session_state.history:
+            last = st.session_state.history[-1]
+            filename = f"{last['algoritma'].replace(' ', '_')}_{last['mode'].lower()}_{datetime.datetime.now().strftime('%H%M%S')}.txt"
 
+            data_to_download = last["hasil"]
+            if not isinstance(data_to_download, str):
+                try:
+                    data_to_download = str(data_to_download)
+                except Exception:
+                    data_to_download = "Tidak bisa menampilkan hasil dalam format teks."
+
+            st.download_button(
+                label="📄 Unduh Hasil Terakhir",
+                data=data_to_download,
+                file_name=filename,
+                mime="text/plain"
+            )
+        else:
+            st.warning("Belum ada hasil yang bisa diunduh.")
+
+# Footer
 st.markdown("<p style='text-align: center; color: grey;'>© 2025 CryptoSim Pro by Badiatul</p>", unsafe_allow_html=True)
+
+# Gaya
 st.markdown("""
 <style>
 body {
