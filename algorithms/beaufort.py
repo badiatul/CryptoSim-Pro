@@ -1,30 +1,35 @@
-# algorithms/beaufort.py
 import streamlit as st
 
-def encrypt(text, key):
-    result = ''
-    for i in range(len(text)):
-        if text[i].isalpha():
-            shift = (ord(key[i % len(key)].upper()) - ord(text[i].upper())) % 26
-            result += chr(ord('A') + shift)
+def beaufort_cipher(text, key):
+    text = text.upper()
+    key = key.upper()
+    result = ""
+    key_index = 0
+    for char in text:
+        if char.isalpha():
+            k = ord(key[key_index % len(key)]) - ord('A')
+            c = (k - (ord(char) - ord('A'))) % 26
+            result += chr(c + ord('A'))
+            key_index += 1
         else:
-            result += text[i]
+            result += char
     return result
 
-def decrypt(text, key):
-    # Sama saja dengan encrypt di Beaufort
-    return encrypt(text, key)
-
 def run(log_history):
-    st.subheader("🔐 Beaufort Cipher")
-    mode = st.radio("Mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("Masukkan teks")
-    key = st.text_input("Masukkan kunci (huruf saja)")
+    st.header("🔐 Beaufort Cipher")
+    st.markdown("""
+    Beaufort Cipher mirip dengan Vigenère Cipher tetapi dengan perhitungan yang berbeda:  
+    hasil = kunci - huruf. Algoritma ini **simetris**, jadi enkripsi dan dekripsi sama saja.
+    """)
 
-    if st.button("Proses"):
-        if not key.isalpha():
-            st.error("Kunci harus berupa huruf.")
+    text = st.text_area("📝 Masukkan Teks")
+    key = st.text_input("🔑 Kunci (huruf)")
+
+    if st.button("🚀 Jalankan Beaufort Cipher"):
+        if not text.strip() or not key.strip().isalpha():
+            st.warning("Teks dan kunci harus valid.")
             return
-        result = encrypt(text.upper(), key.upper()) if mode == "Enkripsi" else decrypt(text.upper(), key.upper())
-        st.success(result)
-        log_history("Beaufort Cipher", mode, text, result)
+        result = beaufort_cipher(text, key)
+        st.success("Hasil:")
+        st.code(result)
+        log_history("Beaufort Cipher", "Enkripsi/Dekripsi", text, result)
