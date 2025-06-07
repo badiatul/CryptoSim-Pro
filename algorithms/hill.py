@@ -2,41 +2,57 @@ import streamlit as st
 import numpy as np
 
 def mod_inverse(a, m):
+    a = a % m
     for x in range(1, m):
         if (a * x) % m == 1:
             return x
     return None
 
-def hill_encrypt(text, key_matrix):
-    text = text.upper().replace(" ", "")
-    while len(text) % 2 != 0:
-        text += 'X'
-    result = ""
-    for i in range(0, len(text), 2):
-        pair = [ord(text[i]) - 65, ord(text[i+1]) - 65]
-        res = np.dot(key_matrix, pair) % 26
-        result += chr(res[0] + 65) + chr(res[1] + 65)
-    return result
+def matrix_mod_inv(matrix, mod):
+    det = int(round(np.linalg.det(matrix)))
+    inv_det = mod_inverse(det % mod, mod)
+    if inv_det is None:
+        return None
+    matrix_mod = np.round(np.linalg.inv(matrix) * det).astype(int) * inv_det
+    return matrix_mod % mod
 
-def hill_decrypt(text, key_matrix):
-    det = int(np.round(np.linalg.det(key_matrix)))
-    det_inv = mod_inverse(det % 26, 26)
-    if det_inv is None:
-        return "Matrix tidak dapat dibalik."
-    adj = np.round(det * np.linalg.inv(key_matrix)).astype(int) % 26
-    inv_matrix = (det_inv * adj) % 26
-    return hill_encrypt(text, inv_matrix)
+def text_to_matrix(text, n):
+    while len(text) % n != 0:
+        text += 'X'
+    return [list(map(lambda c: ord(c.upper()) - 65, text[i:i+n])) for i in range(0, len(text), n)]
+
+def matrix_to_text(matrix):
+    return ''.join(chr(int(round(val)) % 26 + 65) for row in matrix for val in row)
+
+def hill_cipher(text, key_matrix, mode):
+    n = key_matrix.shape[0]
+    blocks = text_to_matrix(text, n)
+    if mode == "Dekripsi":
+        key_matrix = matrix_mod_inv(key_matrix, 26)
+        if key_matrix is None:
+            return "Kunci tidak dapat dibalik."
+    result_blocks = [(np.dot(block, key_matrix) % 26).tolist() for block in blocks]
+    return matrix_to_text(result_blocks)
 
 def run(log_history):
-    st.subheader("🔐 Hill Cipher (2x2)")
+    st.header("🔐 Hill Cipher")
+    st.markdown("""
+    Hill Cipher menggunakan matriks kunci untuk mengenkripsi blok teks.
+    Kunci berbentuk matriks persegi (misalnya 2x2 atau 3x3) dengan determinan yang memiliki invers modulo 26.
+    """)
+
     mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("Masukkan Teks")
-    a = st.number_input("Key[0][0]", 0, 25, 3)
-    b = st.number_input("Key[0][1]", 0, 25, 3)
-    c = st.number_input("Key[1][0]", 0, 25, 2)
-    d = st.number_input("Key[1][1]", 0, 25, 5)
-    if st.button("Proses"):
-        key_matrix = np.array([[a, b], [c, d]])
-        result = hill_encrypt(text, key_matrix) if mode == "Enkripsi" else hill_decrypt(text, key_matrix)
-        st.success(result)
+    text = st.text_area("📝 Masukkan Teks (huruf saja)")
+    key_input = st.text_area("🔑 Masukkan Matriks Kunci (pisahkan dengan koma dan baris baru)", placeholder="Contoh:\n3,3\n2,5")
+
+    if st.button("🚀 Jalankan Hill Cipher"):
+        try:
+            rows = key_input.strip().split("\n")
+            key_matrix = np.array([[int(num) for num in row.split(",")] for row in rows])
+        except:
+            st.error("Format matriks salah.")
+            return
+        result = hill_cipher(text, key_matrix, mode)
+        st.success(f"Hasil {mode}:")
+        st.code(result)
         log_history("Hill Cipher", mode, text, result)
