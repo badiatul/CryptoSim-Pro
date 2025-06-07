@@ -1,50 +1,41 @@
 import streamlit as st
 
-def encrypt(text, key):
-    rail = ['' for _ in range(key)]
-    dir_down = False
-    row = 0
+def encrypt_rail_fence(text, rails):
+    fence = [[] for _ in range(rails)]
+    rail = 0
+    direction = 1
     for char in text:
-        rail[row] += char
-        if row == 0 or row == key - 1:
-            dir_down = not dir_down
-        row += 1 if dir_down else -1
-    return ''.join(rail)
+        fence[rail].append(char)
+        rail += direction
+        if rail == 0 or rail == rails - 1:
+            direction *= -1
+    return ''.join(''.join(row) for row in fence)
 
-def decrypt(cipher, key):
-    rail = [['\n' for _ in range(len(cipher))] for _ in range(key)]
-    dir_down = None
-    row, index = 0, 0
-    for i in range(len(cipher)):
-        if row == 0:
-            dir_down = True
-        if row == key - 1:
-            dir_down = False
-        rail[row][i] = '*'
-        row += 1 if dir_down else -1
-    index = 0
-    for i in range(key):
-        for j in range(len(cipher)):
-            if rail[i][j] == '*' and index < len(cipher):
-                rail[i][j] = cipher[index]
-                index += 1
-    result = ''
-    row = 0
-    for i in range(len(cipher)):
-        result += rail[row][i]
-        if row == 0:
-            dir_down = True
-        elif row == key - 1:
-            dir_down = False
-        row += 1 if dir_down else -1
-    return result
+def decrypt_rail_fence(text, rails):
+    pattern = list(range(rails)) + list(range(rails - 2, 0, -1))
+    pattern = pattern * (len(text) // len(pattern) + 1)
+    indexes = sorted(range(len(text)), key=lambda i: pattern[i])
+    result = [''] * len(text)
+    for i, char in zip(indexes, text):
+        result[i] = char
+    return ''.join(result)
 
 def run(log_history):
-    st.subheader("🔐 Rail Fence Cipher")
+    st.header("🔐 Rail Fence Cipher")
+    st.markdown("""
+    Rail Fence Cipher menyusun huruf pesan dalam bentuk zig-zag sesuai jumlah rel (baris).
+    Huruf-huruf disusun berdasarkan rel lalu dibaca per rel secara horizontal.
+    """)
+
     mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("Masukkan Teks")
-    key = st.slider("Jumlah Rel", 2, 10, 3)
-    if st.button("Proses"):
-        result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
-        st.success(result)
+    text = st.text_area("📝 Masukkan Teks")
+    rails = st.number_input("🚆 Jumlah Rel", min_value=2, max_value=10, value=3)
+
+    if st.button("🚀 Jalankan Rail Fence Cipher"):
+        if not text.strip():
+            st.warning("Teks tidak boleh kosong.")
+            return
+        result = encrypt_rail_fence(text, rails) if mode == "Enkripsi" else decrypt_rail_fence(text, rails)
+        st.success(f"Hasil {mode}:")
+        st.code(result)
         log_history("Rail Fence Cipher", mode, text, result)
