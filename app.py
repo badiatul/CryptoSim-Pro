@@ -1,6 +1,6 @@
 import streamlit as st
 import datetime
-from algorithms import caesar, vigenere, railfence, playfair, hill, beaufort, columnar, lsb
+from algorithms import caesar, vigenere, railfence, playfair, hill, beaufort, columnar, lsb, ecc, chacha20, fernet
 
 st.set_page_config(page_title="CryptoSim Pro", layout="centered", page_icon="🛡️")
 
@@ -33,7 +33,10 @@ menu = [
     "Hill Cipher",
     "Beaufort Cipher",
     "Columnar Transposition Cipher",
-    "LSB Steganography"
+    "LSB Steganography",
+    "ECC",
+    "ChaCha20",
+    "Fernet"
 ]
 
 choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
@@ -65,6 +68,13 @@ elif choice == "Columnar Transposition Cipher":
     columnar.run(log_history)
 elif choice == "LSB Steganography":
     lsb.run(log_history)
+elif choice == "ECC":
+    ecc.run(log_history)
+elif choice == "ChaCha20":
+    chacha20.run(log_history)
+elif choice == "Fernet":
+    fernet.run(log_history)
+
 
 # Riwayat
 with st.expander("🕘 Lihat Riwayat"):
@@ -134,7 +144,7 @@ input, textarea, .stTextInput > div > div, .stTextArea > div > div, .stNumberInp
     color: #004d40;
 }
 footer {
-    visibility: visible;
+    visibility: hidden;
 }
 </style>
 """, unsafe_allow_html=True)
