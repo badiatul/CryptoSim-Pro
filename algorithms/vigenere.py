@@ -1,42 +1,40 @@
 import streamlit as st
 
-def format_key(text, key):
-    key = list(key)
-    if len(key) == len(text):
-        return "".join(key)
-    else:
-        for i in range(len(text) - len(key)):
-            key.append(key[i % len(key)])
-    return "".join(key)
-
-def encrypt(text, key):
-    key = format_key(text, key)
-    cipher = ""
-    for i in range(len(text)):
-        if text[i].isalpha():
-            offset = 65 if text[i].isupper() else 97
-            cipher += chr((ord(text[i]) + ord(key[i]) - 2*offset) % 26 + offset)
+def vigenere_cipher(text, key, mode):
+    result = ""
+    key = key.upper()
+    key_len = len(key)
+    j = 0
+    for char in text:
+        if char.isalpha():
+            k = ord(key[j % key_len]) - ord('A')
+            if mode == "Dekripsi":
+                k = -k
+            base = ord('A') if char.isupper() else ord('a')
+            result += chr((ord(char) - base + k) % 26 + base)
+            j += 1
         else:
-            cipher += text[i]
-    return cipher
-
-def decrypt(cipher, key):
-    key = format_key(cipher, key)
-    text = ""
-    for i in range(len(cipher)):
-        if cipher[i].isalpha():
-            offset = 65 if cipher[i].isupper() else 97
-            text += chr((ord(cipher[i]) - ord(key[i])) % 26 + offset)
-        else:
-            text += cipher[i]
-    return text
+            result += char
+    return result
 
 def run(log_history):
-    st.subheader("🔐 Vigenère Cipher")
+    st.header("🔐 Vigenère Cipher")
+    st.markdown("""
+    Vigenère Cipher adalah metode kriptografi dengan kunci berbentuk kata.  
+    Setiap huruf pada kunci digunakan untuk mengenkripsi satu huruf pada pesan.
+
+    - Misal plaintext: `HELLO` dan key: `KEY` → Enkripsi akan bergantian menggunakan `K`, `E`, `Y`, ...
+    """)
+
     mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("Masukkan Teks")
-    key = st.text_input("Masukkan Kunci (A-Z)")
-    if st.button("Proses") and key:
-        result = encrypt(text, key) if mode == "Enkripsi" else decrypt(text, key)
-        st.success(result)
+    text = st.text_area("📝 Masukkan Teks")
+    key = st.text_input("🔑 Kunci (huruf)")
+
+    if st.button("🚀 Jalankan Vigenère Cipher"):
+        if not text.strip() or not key.strip().isalpha():
+            st.warning("Teks dan kunci harus valid.")
+            return
+        result = vigenere_cipher(text, key, mode)
+        st.success(f"Hasil {mode}:")
+        st.code(result)
         log_history("Vigenère Cipher", mode, text, result)
