@@ -1,6 +1,7 @@
 """
 ECC Encryption/Decryption Module for CryptoSim Pro
-Menggunakan encoding Base64 untuk hasil enkripsi agar kompatibel dengan Streamlit dan unduhan.
+Menggunakan kurva brainpoolP256r1 dengan metode XOR sederhana terhadap shared secret.
+Hasil enkripsi diencode dalam Base64 agar aman untuk ditampilkan dan disimpan.
 """
 
 import streamlit as st
@@ -8,36 +9,36 @@ import base64
 from tinyec import registry
 import secrets
 
+# Gunakan kurva eliptik brainpoolP256r1
 curve = registry.get_curve('brainpoolP256r1')
 
-def compress_point(point):
-    return hex(point.x) + hex(point.y % 2)[2:]
-
+# Fungsi untuk mengenkripsi teks
 def ecc_encrypt(pubKey, plaintext):
     plaintext_bytes = plaintext.encode('utf-8')
-    shared_secret = pubKey.x.to_bytes(32, 'big')
+    shared_secret = pubKey.x.to_bytes(32, 'big')  # shared secret berupa bilangan dari x
     encrypted = bytes([_a ^ _b for _a, _b in zip(plaintext_bytes, shared_secret)])
-    return base64.b64encode(encrypted).decode('utf-8')
+    return base64.b64encode(encrypted).decode('utf-8')  # encode ke base64 untuk tampil & simpan
 
-def ecc_decrypt(privKey, ciphertext_b64):
+# Fungsi untuk mendekripsi teks
+def ecc_decrypt(privKey, pubKey, ciphertext_b64):
     ciphertext = base64.b64decode(ciphertext_b64)
-    shared_secret = privKey.public_key.x.to_bytes(32, 'big')
+    shared_secret = (privKey * pubKey).x.to_bytes(32, 'big')
     decrypted = bytes([_a ^ _b for _a, _b in zip(ciphertext, shared_secret)])
     return decrypted.decode('utf-8', errors='ignore')
 
+# Fungsi utama yang akan dijalankan di Streamlit
 def run(log_history):
     st.markdown("## 🔐 ECC Encryption / Decryption")
 
-    # Inisialisasi kunci di session_state agar tetap konsisten
-    if "ecc_privKey" not in st.session_state:
-        st.session_state.ecc_privKey = secrets.randbelow(curve.field.n)
-        st.session_state.ecc_pubKey = st.session_state.ecc_privKey * curve.g
+    st.markdown("### 🧮 Generate Key Pair")
+    privKey = secrets.randbelow(curve.field.n)
+    pubKey = privKey * curve.g
 
-    privKey = st.session_state.ecc_privKey
-    pubKey = st.session_state.ecc_pubKey
-
-    st.code(f"Public Key:\n({pubKey.x}, {pubKey.y})", language="text")
-    st.code(f"Private Key:\n{privKey}", language="text")
+    # Tampilkan kunci publik dan privat
+    st.write("**Public Key:**")
+    st.code(f"({pubKey.x}, {pubKey.y})", language="python")
+    st.write("**Private Key:**")
+    st.code(f"{privKey}", language="python")
 
     mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
 
@@ -46,19 +47,27 @@ def run(log_history):
         if st.button("Enkripsi"):
             if plaintext:
                 encrypted = ecc_encrypt(pubKey, plaintext)
-                st.success(f"Hasil Enkripsi (base64):\n{encrypted}")
+                st.success("✅ Enkripsi berhasil!")
+                st.code(encrypted, language="text")
                 log_history("ECC", "Enkripsi", plaintext, encrypted)
             else:
-                st.warning("Masukkan teks untuk dienkripsi.")
-    else:
-        ciphertext_b64 = st.text_area("Masukkan teks base64 yang akan didekripsi")
+                st.warning("⚠️ Masukkan teks terlebih dahulu.")
+    else:  # Dekripsi
+        ciphertext_b64 = st.text_area("Masukkan ciphertext (base64)")
+        pubkey_x = st.text_input("Masukkan X dari Public Key")
+        pubkey_y = st.text_input("Masukkan Y dari Public Key")
+        priv_input = st.text_input("Masukkan Private Key", type="password")
+
         if st.button("Dekripsi"):
-            if ciphertext_b64:
+            if ciphertext_b64 and pubkey_x and pubkey_y and priv_input:
                 try:
-                    decrypted = ecc_decrypt(privKey, ciphertext_b64)
-                    st.success(f"Hasil Dekripsi:\n{decrypted}")
+                    pubKey_decrypt = curve.point_class(int(pubkey_x), int(pubkey_y), curve)
+                    privKey_decrypt = int(priv_input)
+                    decrypted = ecc_decrypt(privKey_decrypt, pubKey_decrypt, ciphertext_b64)
+                    st.success("✅ Dekripsi berhasil!")
+                    st.code(decrypted, language="text")
                     log_history("ECC", "Dekripsi", ciphertext_b64, decrypted)
                 except Exception as e:
-                    st.error(f"Gagal dekripsi: {e}")
+                    st.error(f"❌ Gagal mendekripsi: {e}")
             else:
-                st.warning("Masukkan teks base64 untuk didekripsi.")
+                st.warning("⚠️ Lengkapi semua isian terlebih dahulu untuk dekripsi.")
