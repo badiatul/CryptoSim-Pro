@@ -1,0 +1,4 @@
+streamlit
+tinyec
+cryptography
+pycryptodome
