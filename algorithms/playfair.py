@@ -1,50 +1,72 @@
 import streamlit as st
+import re
 
-def prepare_input(text):
-    text = text.upper().replace('J', 'I')
-    prepared = ''
+def clean_text(text):
+    """Ubah teks ke huruf besar, ganti J jadi I, dan hilangkan non-huruf"""
+    text = text.upper().replace("J", "I")
+    return re.sub(r'[^A-Z]', '', text)
+
+def prepare_plaintext(text):
+    """Siapkan pasangan huruf Playfair: hilangkan non-huruf, tangani huruf ganda, dan ganjil"""
+    text = clean_text(text)
+    result = ''
     i = 0
     while i < len(text):
         a = text[i]
         b = text[i+1] if i+1 < len(text) else 'X'
         if a == b:
-            prepared += a + 'X'
+            result += a + 'X'
             i += 1
         else:
-            prepared += a + b
+            result += a + b
             i += 2
-    if len(prepared) % 2 != 0:
-        prepared += 'X'
-    return prepared
+    if len(result) % 2 != 0:
+        result += 'X'
+    return result
 
-def create_matrix(key):
-    key = key.upper().replace('J', 'I')
+def generate_matrix(key):
+    """Buat matriks 5x5 dari kunci unik"""
+    key = clean_text(key)
     seen = set()
-    matrix = []
-    for char in key + 'ABCDEFGHIKLMNOPQRSTUVWXYZ':
+    matrix_key = ''
+    for char in key + "ABCDEFGHIKLMNOPQRSTUVWXYZ":  # J diganti I
         if char not in seen:
             seen.add(char)
-            matrix.append(char)
-    return [matrix[i:i+5] for i in range(0, 25, 5)]
+            matrix_key += char
+    return [list(matrix_key[i:i+5]) for i in range(0, 25, 5)]
 
-def find_pos(matrix, char):
+def find_position(matrix, char):
     for i, row in enumerate(matrix):
         if char in row:
             return i, row.index(char)
+    return None, None  # Seharusnya tidak terjadi
 
 def process_pair(a, b, matrix, mode):
-    ax, ay = find_pos(matrix, a)
-    bx, by = find_pos(matrix, b)
+    ax, ay = find_position(matrix, a)
+    bx, by = find_position(matrix, b)
+
+    if ax is None or bx is None:
+        return a, b  # fallback defensif
+
     if ax == bx:
-        return (matrix[ax][(ay+1)%5], matrix[bx][(by+1)%5]) if mode == 'Enkripsi' else (matrix[ax][(ay-1)%5], matrix[bx][(by-1)%5])
+        if mode == "Enkripsi":
+            return matrix[ax][(ay+1)%5], matrix[bx][(by+1)%5]
+        else:
+            return matrix[ax][(ay-1)%5], matrix[bx][(by-1)%5]
     elif ay == by:
-        return (matrix[(ax+1)%5][ay], matrix[(bx+1)%5][by]) if mode == 'Enkripsi' else (matrix[(ax-1)%5][ay], matrix[(bx-1)%5][by])
+        if mode == "Enkripsi":
+            return matrix[(ax+1)%5][ay], matrix[(bx+1)%5][by]
+        else:
+            return matrix[(ax-1)%5][ay], matrix[(bx-1)%5][by]
     else:
         return matrix[ax][by], matrix[bx][ay]
 
 def cipher(text, key, mode):
-    matrix = create_matrix(key)
-    text = prepare_input(text)
+    matrix = generate_matrix(key)
+    if mode == "Enkripsi":
+        text = prepare_plaintext(text)
+    else:
+        text = clean_text(text)
     result = ''
     for i in range(0, len(text), 2):
         a, b = process_pair(text[i], text[i+1], matrix, mode)
@@ -52,11 +74,33 @@ def cipher(text, key, mode):
     return result
 
 def run(log_history):
-    st.subheader("🔐 Playfair Cipher")
+    st.header("🔐 Playfair Cipher")
+    st.markdown("""
+    Algoritma ini menggunakan matriks 5x5 untuk mengenkripsi pasangan huruf.  
+    - Huruf **J** akan diganti menjadi **I**  
+    - Pasangan huruf yang sama akan disisipkan **X**  
+    - Jika jumlah huruf ganjil, ditambahkan **X** di akhir
+
+    **Contoh kunci:** `MONARCHY`, `KEYWORD`, `SECURE`
+    """)
+
     mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("Masukkan Teks")
-    key = st.text_input("Masukkan Kunci")
-    if st.button("Proses") and key:
-        result = cipher(text, key, mode)
-        st.success(result)
-        log_history("Playfair Cipher", mode, text, result)
+    key_input = st.text_input("🔑 Masukkan Kunci", max_chars=25)
+    text_input = st.text_area("📄 Masukkan Teks", height=150)
+
+    if st.button(f"🚀 Jalankan {mode}"):
+        if not key_input.strip():
+            st.error("Kunci tidak boleh kosong.")
+            return
+        if not text_input.strip():
+            st.error("Teks input tidak boleh kosong.")
+            return
+
+        try:
+            result = cipher(text_input, key_input, mode)
+            st.success("✅ Hasil:")
+            st.code(result, language="text")
+
+            log_history("Playfair Cipher", mode, text_input, result)
+        except Exception as e:
+            st.error(f"Terjadi kesalahan saat memproses: {e}")
