@@ -1,10 +1,16 @@
 """
 ChaCha20 Symmetric Encryption
 Algoritma enkripsi simetris modern yang cepat dan aman,
-menggunakan nonce dan key 256-bit.
-Memerlukan library 'cryptography'.
-"""
+menggunakan nonce dan key 256-bit (32 byte key, 12 byte nonce).
 
+Catatan penting:
+- Key harus berupa hex 64 karakter (32 byte)
+- Nonce harus berupa hex 24 karakter (12 byte)
+- Contoh pembuatan key/nonce dengan os.urandom di Python:
+    import os
+    os.urandom(32).hex()  # untuk key
+    os.urandom(12).hex()  # untuk nonce
+"""
 import streamlit as st
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
