@@ -23,8 +23,9 @@ def log_history(alg, mode, input_text, result):
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     })
 
-# Sidebar pilih algoritma
+# Sidebar pilih algoritma (dengan Beranda di awal)
 menu = [
+    "Beranda",
     "Caesar Cipher",
     "Vigenère Cipher",
     "Rail Fence Cipher",
@@ -36,11 +37,19 @@ menu = [
 ]
 
 choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
-print("DAFTAR MENU:", menu)
-print("PILIHAN:", choice)
 
+# Konten Beranda
+if choice == "Beranda":
+    st.markdown("## 👋 Selamat Datang di **CryptoSim Pro!**")
+    st.markdown("""
+    Aplikasi ini dibuat untuk memenuhi tugas **UAS Pemrograman Kriptografi**.
+
+    🔐 Gunakan berbagai metode kriptografi klasik untuk proses enkripsi dan dekripsi teks.  
+    📁 Anda juga dapat mengunggah file dan melihat riwayat penggunaan.  
+    🛡️ Silakan pilih algoritma di sidebar untuk memulai simulasi.
+    """)
 # Jalankan algoritma sesuai pilihan
-if choice == "Caesar Cipher":
+elif choice == "Caesar Cipher":
     caesar.run(log_history)
 elif choice == "Vigenère Cipher":
     vigenere.run(log_history)
@@ -53,11 +62,10 @@ elif choice == "Hill Cipher":
 elif choice == "Beaufort Cipher":
     beaufort.run(log_history)
 elif choice == "Columnar Transposition Cipher":
-    print("Columnar dipanggil")
     columnar.run(log_history)
 elif choice == "LSB Steganography":
     lsb.run(log_history)
-    
+
 # Riwayat
 with st.expander("🕘 Lihat Riwayat"):
     if st.session_state.history:
