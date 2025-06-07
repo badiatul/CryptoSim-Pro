@@ -75,7 +75,6 @@ elif choice == "ChaCha20":
 elif choice == "Fernet":
     fernet.run(log_history)
 
-
 # Riwayat
 with st.expander("🕘 Lihat Riwayat"):
     if st.session_state.history:
@@ -96,9 +95,17 @@ with st.expander("⬇️ Unduh Hasil Enkripsi/Dekripsi"):
     if st.session_state.history:
         last = st.session_state.history[-1]
         filename = f"{last['algoritma'].replace(' ', '_')}_{last['mode'].lower()}_{datetime.datetime.now().strftime('%H%M%S')}.txt"
+        
+        data_to_download = last["hasil"]
+        if not isinstance(data_to_download, str):
+            try:
+                data_to_download = str(data_to_download)
+            except Exception:
+                data_to_download = "Tidak bisa menampilkan hasil dalam format teks."
+        
         st.download_button(
             label="📄 Unduh Hasil Terakhir",
-            data=last["hasil"],
+            data=data_to_download,
             file_name=filename,
             mime="text/plain"
         )
