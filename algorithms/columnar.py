@@ -1,55 +1,40 @@
-# algorithms/columnar.py
 import streamlit as st
 
-def encrypt(text, key):
+def columnar_encrypt(text, key):
+    key_order = sorted(list(key))
+    col_order = [key.index(k) for k in key_order]
+    rows = [text[i:i+len(key)] for i in range(0, len(text), len(key))]
+    if len(rows[-1]) < len(key):
+        rows[-1] += ' ' * (len(key) - len(rows[-1]))
+    return ''.join(''.join(row[i] for row in rows) for i in col_order)
+
+def columnar_decrypt(text, key):
     n_cols = len(key)
-    n_rows = (len(text) + n_cols - 1) // n_cols
-    matrix = [['' for _ in range(n_cols)] for _ in range(n_rows)]
-    
-    index = 0
-    for i in range(n_rows):
-        for j in range(n_cols):
-            if index < len(text):
-                matrix[i][j] = text[index]
-                index += 1
-    
-    key_order = sorted(list(enumerate(key)), key=lambda x: x[1])
-    ciphertext = ''
-    for idx, _ in key_order:
-        for row in matrix:
-            ciphertext += row[idx]
-    return ciphertext
-
-def decrypt(text, key):
-    n_cols = len(key)
-    n_rows = (len(text) + n_cols - 1) // n_cols
-    matrix = [['' for _ in range(n_cols)] for _ in range(n_rows)]
-
-    key_order = sorted(list(enumerate(key)), key=lambda x: x[1])
-    index = 0
-    for idx, _ in key_order:
-        for i in range(n_rows):
-            if index < len(text):
-                matrix[i][idx] = text[index]
-                index += 1
-
-    plaintext = ''
-    for row in matrix:
-        for char in row:
-            plaintext += char
-    return plaintext.strip()
+    n_rows = len(text) // n_cols
+    key_order = sorted(list(key))
+    col_order = [key.index(k) for k in key_order]
+    cols = [''] * n_cols
+    i = 0
+    for idx in col_order:
+        cols[idx] = text[i:i+n_rows]
+        i += n_rows
+    return ''.join(''.join(row) for row in zip(*cols))
 
 def run(log_history):
-    st.subheader("📤 Columnar Transposition Cipher")
-    mode = st.radio("Mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("Masukkan teks")
-    key = st.text_input("Masukkan kunci (huruf, minimal 2 karakter)")
+    st.header("🔐 Columnar Transposition Cipher")
+    st.markdown("""
+    Columnar Transposition Cipher menyusun pesan dalam bentuk tabel, lalu membacanya berdasarkan urutan abjad kunci.
+    """)
 
-    if st.button("Proses"):
-        if len(key) < 2 or not key.isalpha():
-            st.error("Kunci harus berupa huruf dan minimal 2 karakter.")
+    mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
+    text = st.text_area("📝 Masukkan Teks")
+    key = st.text_input("🔑 Kunci (huruf unik)")
+
+    if st.button("🚀 Jalankan Columnar Cipher"):
+        if not text.strip() or not key.strip().isalpha():
+            st.warning("Teks dan kunci tidak boleh kosong.")
             return
-
-        result = encrypt(text.replace(" ", ""), key.lower()) if mode == "Enkripsi" else decrypt(text, key.lower())
-        st.success(result)
+        result = columnar_encrypt(text, key) if mode == "Enkripsi" else columnar_decrypt(text, key)
+        st.success(f"Hasil {mode}:")
+        st.code(result)
         log_history("Columnar Transposition Cipher", mode, text, result)
