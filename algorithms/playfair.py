@@ -75,6 +75,7 @@ def cipher(text, key, mode):
 
 def run(log_history):
     st.header("🔐 Playfair Cipher")
+    st.write("Playfair Loaded")
     st.markdown("""
     Algoritma ini menggunakan matriks 5x5 untuk mengenkripsi pasangan huruf.  
     - Huruf **J** akan diganti menjadi **I**  
