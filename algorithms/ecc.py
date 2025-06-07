@@ -15,10 +15,8 @@ def compress_point(point):
 
 def ecc_encrypt(pubKey, plaintext):
     plaintext_bytes = plaintext.encode('utf-8')
-    # Simple XOR dengan shared secret (contoh demo)
     shared_secret = pubKey.x.to_bytes(32, 'big')
     encrypted = bytes([_a ^ _b for _a, _b in zip(plaintext_bytes, shared_secret)])
-    # encode ke base64 string supaya aman simpan & tampil
     return base64.b64encode(encrypted).decode('utf-8')
 
 def ecc_decrypt(privKey, ciphertext_b64):
@@ -28,32 +26,37 @@ def ecc_decrypt(privKey, ciphertext_b64):
     return decrypted.decode('utf-8', errors='ignore')
 
 def run(log_history):
-    st.markdown("## ECC Encryption / Decryption")
-    
-    privKey = secrets.randbelow(curve.field.n)
-    pubKey = privKey * curve.g
-    
-    st.write("**Public Key:**", f"({pubKey.x}, {pubKey.y})")
-    st.write("**Private Key:**", privKey)
-    
+    st.markdown("## 🔐 ECC Encryption / Decryption")
+
+    # Inisialisasi kunci di session_state agar tetap konsisten
+    if "ecc_privKey" not in st.session_state:
+        st.session_state.ecc_privKey = secrets.randbelow(curve.field.n)
+        st.session_state.ecc_pubKey = st.session_state.ecc_privKey * curve.g
+
+    privKey = st.session_state.ecc_privKey
+    pubKey = st.session_state.ecc_pubKey
+
+    st.code(f"Public Key:\n({pubKey.x}, {pubKey.y})", language="text")
+    st.code(f"Private Key:\n{privKey}", language="text")
+
     mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
-    
+
     if mode == "Enkripsi":
         plaintext = st.text_area("Masukkan teks yang akan dienkripsi")
         if st.button("Enkripsi"):
             if plaintext:
                 encrypted = ecc_encrypt(pubKey, plaintext)
-                st.success(f"Hasil Enkripsi (base64): {encrypted}")
+                st.success(f"Hasil Enkripsi (base64):\n{encrypted}")
                 log_history("ECC", "Enkripsi", plaintext, encrypted)
             else:
                 st.warning("Masukkan teks untuk dienkripsi.")
-    else:  # Dekripsi
+    else:
         ciphertext_b64 = st.text_area("Masukkan teks base64 yang akan didekripsi")
         if st.button("Dekripsi"):
             if ciphertext_b64:
                 try:
                     decrypted = ecc_decrypt(privKey, ciphertext_b64)
-                    st.success(f"Hasil Dekripsi: {decrypted}")
+                    st.success(f"Hasil Dekripsi:\n{decrypted}")
                     log_history("ECC", "Dekripsi", ciphertext_b64, decrypted)
                 except Exception as e:
                     st.error(f"Gagal dekripsi: {e}")
