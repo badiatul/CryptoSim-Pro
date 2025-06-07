@@ -11,7 +11,6 @@ def run(log_history):
 
     # Penjelasan tentang Fernet
     st.markdown("""
-    ### 📖 Apa itu Fernet?
     Fernet adalah algoritma kriptografi **modern dan simetris**, artinya menggunakan **satu kunci** yang sama untuk enkripsi dan dekripsi.
 
     - Data yang dienkripsi akan **aman dan tidak bisa dibaca** tanpa kunci yang benar.
