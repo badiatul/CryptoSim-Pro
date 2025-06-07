@@ -30,6 +30,19 @@ def ecc_decrypt(privKey, pubKey, ciphertext_b64):
 def run(log_history):
     st.markdown("## 🔐 ECC Encryption / Decryption")
 
+        st.info("""
+ECC adalah metode kriptografi modern yang menggunakan titik-titik pada kurva eliptik untuk mengenkripsi dan mendekripsi data. Kelebihannya adalah:
+
+🔐 **Keamanan tinggi** — ECC menawarkan tingkat keamanan setara RSA tetapi dengan ukuran kunci yang jauh lebih kecil.  
+⚡ **Lebih cepat dan efisien** — Cocok untuk perangkat terbatas seperti smartphone atau IoT.  
+🔑 **Kunci Publik dan Privat** — Proses enkripsi dilakukan dengan kunci publik, dan dekripsi hanya bisa dilakukan dengan kunci privat.
+
+Pada demo ini:
+- **Shared secret** dibentuk dari hasil operasi `private_key * public_key`.
+- Teks dienkripsi dengan metode XOR terhadap shared secret (untuk kemudahan demo).
+- Hasil enkripsi dikonversi ke **base64** agar bisa ditampilkan dan diunduh dengan aman.
+    """)
+
     st.markdown("### 🧮 Generate Key Pair")
     privKey = secrets.randbelow(curve.field.n)
     pubKey = privKey * curve.g
