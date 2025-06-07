@@ -144,7 +144,7 @@ input, textarea, .stTextInput > div > div, .stTextArea > div > div, .stNumberInp
     color: #004d40;
 }
 footer {
-    visibility: hidden;
+    visibility: visible;
 }
 </style>
 """, unsafe_allow_html=True)
