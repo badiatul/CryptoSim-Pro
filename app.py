@@ -47,7 +47,7 @@ if choice == "Beranda":
     st.markdown("""
     Aplikasi ini dibuat untuk memenuhi tugas **UAS Pemrograman Kriptografi**.
 
-    🔐 Gunakan berbagai metode kriptografi klasik untuk proses enkripsi dan dekripsi teks.  
+    🔐 Gunakan beberapa metode kriptografi klasik dan modern untuk proses enkripsi dan dekripsi teks.  
     📁 Anda juga dapat mengunggah file dan melihat riwayat penggunaan.  
     🛡️ Silakan pilih algoritma di sidebar untuk memulai simulasi.
     """)
