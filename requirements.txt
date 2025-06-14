@@ -2,3 +2,4 @@ streamlit
 tinyec
 cryptography
 pycryptodome
+qrcode
