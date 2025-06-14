@@ -1,62 +1,77 @@
-/* Warna latar belakang halaman utama */
+/* Warna dasar untuk mode terang */
 body {
-    background-color: #a7d8c9 !important;
+    background-color: #e0f2f1;
+    color: #004d40;
 }
 
-/* Warna latar belakang sidebar */
+/* Sidebar (mode terang) */
 [data-testid="stSidebar"] {
-    background-color: #4db6ac !important;
+    background-color: #b2dfdb;
+    color: #004d40;
 }
 
-/* Container utama Streamlit */
-[data-testid="stAppViewContainer"] {
-    background-color: #e0f2f1 !important;
-}
-
-/* Header dan teks utama */
+/* Komponen teks */
 h1, h2, h3, h4, h5, h6, p, label {
-    color: #00796b !important;
+    color: #004d40;
 }
 
-/* Tombol utama */
+/* Tombol */
 .stButton > button {
-    background-color: #00897b !important;
-    color: white !important;
-    border-radius: 8px !important;
-    border: none !important;
-    font-weight: bold !important;
-    padding: 0.5em 1em !important;
+    background-color: #26a69a;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    padding: 0.5em 1em;
 }
-
 .stButton > button:hover {
-    background-color: #004d40 !important;
+    background-color: #00796b;
 }
 
-/* Kotak alert */
+/* Komponen alert/info box */
 .stAlert > div {
     background-color: #b2dfdb !important;
     color: #004d40 !important;
 }
 
-/* Kotak di riwayat */
+/* Expander */
 div[data-testid="stExpander"] > div > div {
-    background-color: #b2dfdb !important;
-    border-radius: 10px !important;
-}
-
-/* Input dan textarea */
-input, textarea, .stTextInput > div > div, .stTextArea > div > div, .stNumberInput > div > div {
     background-color: #e0f2f1 !important;
-    border-radius: 5px !important;
-    color: #004d40 !important;
+    border-radius: 10px;
 }
 
-/* Label dan radio */
+/* Input field */
+input, textarea, .stTextInput > div > div, .stTextArea > div > div, .stNumberInput > div > div {
+    background-color: #f1f8e9;
+    border-radius: 5px;
+    color: #004d40;
+}
+
+/* Label */
 .stRadio > label, .stSelectbox > label {
-    color: #004d40 !important;
+    color: #004d40;
 }
 
-/* Sembunyikan footer */
-footer {
-    visibility: hidden !important;
+/* Mode gelap */
+html[data-theme="dark"] body {
+    background-color: #003c3c !important;
+    color: #e0f2f1 !important;
+}
+html[data-theme="dark"] [data-testid="stSidebar"] {
+    background-color: #002f2f !important;
+}
+html[data-theme="dark"] .stAlert > div {
+    background-color: #004d40 !important;
+    color: #ffffff !important;
+}
+html[data-theme="dark"] div[data-testid="stExpander"] > div > div {
+    background-color: #004d40 !important;
+}
+html[data-theme="dark"] input, 
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] .stTextInput > div > div, 
+html[data-theme="dark"] .stTextArea > div > div, 
+html[data-theme="dark"] .stNumberInput > div > div {
+    background-color: #004d40;
+    color: white;
 }
