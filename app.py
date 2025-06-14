@@ -1,102 +1,167 @@
 import streamlit as st
 import datetime
-import base64
 import qrcode
-
-# --- Import algoritma ---
-try:
-    from algorithms import (
-        caesar, vigenere, railfence, playfair, hill,
-        beaufort, columnar, lsb, ecc, chacha20, fernet
-    )
-except Exception as e:
-    st.error(f"❌ Gagal import algoritma: {e}")
-
-# --- Konfigurasi halaman ---
-st.set_page_config(
-    page_title="CryptoSim Pro",
-    layout="centered",
-    page_icon="🛡️"
+from io import BytesIO
+from algorithms import (
+    caesar, vigenere, railfence, playfair, hill,
+    beaufort, columnar, lsb, ecc, chacha20, fernet
 )
 
-# --- CSS Kustom ---
-try:
-    with open("style.css") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-except FileNotFoundError:
-    st.warning("⚠️ File style.css tidak ditemukan.")
+# Konfigurasi Halaman
+st.set_page_config(page_title="CryptoSim Pro", layout="centered", page_icon="🛡️")
 
-# --- Tema Gelap/Terang ---
-is_dark = st.sidebar.toggle("🌙 Mode Gelap", value=False)
-mode = "dark" if is_dark else "light"
-st.markdown(f'<body class="{mode}">', unsafe_allow_html=True)
+# Toggle Mode Gelap/Terang
+mode = st.sidebar.toggle("🌙 Mode Gelap", value=False)
 
-# --- Pilihan Algoritma ---
-menu = st.sidebar.selectbox(
-    "🔍 Pilih Algoritma",
-    (
-        "Beranda",
-        "Caesar Cipher", "Vigenère Cipher", "Rail Fence Cipher",
-        "Playfair Cipher", "Hill Cipher", "Beaufort Cipher",
-        "Columnar Transposition",
-        "LSB Steganography", "ECC", "ChaCha20", "Fernet"
-    )
-)
+# Tema berdasarkan mode
+primary_color = "#004d40" if not mode else "#ffffff"
+background_color = "#e0f2f1" if not mode else "#121212"
+sidebar_color = "#b2dfdb" if not mode else "#1e1e1e"
+font_color = "#004d40" if not mode else "#e0f7fa"
+button_color = "#26a69a" if not mode else "#2e8b57"
+hover_color = "#00796b" if not mode else "#43a047"
 
-# --- Fungsi Simpan Riwayat ---
-def log_history(algo, proses, plaintext, key, hasil):
-    with open("riwayat.txt", "a", encoding="utf-8") as f:
-        f.write(f"{datetime.datetime.now()} | {algo} | {proses} | {plaintext} | {key} | {hasil}\n")
+# Gaya CSS dinamis
+st.markdown(f"""
+<style>
+body {{
+    background-color: {background_color};
+}}
+[data-testid="stSidebar"] {{
+    background-color: {sidebar_color};
+}}
+h1, h2, h3, h4, h5, h6, p {{
+    color: {primary_color};
+}}
+.stButton > button {{
+    background-color: {button_color};
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    padding: 0.5em 1em;
+}}
+.stButton > button:hover {{
+    background-color: {hover_color};
+}}
+.stAlert > div {{
+    background-color: {sidebar_color} !important;
+    color: {primary_color} !important;
+}}
+div[data-testid="stExpander"] > div > div {{
+    background-color: {background_color} !important;
+    border-radius: 10px;
+}}
+input, textarea, .stTextInput > div > div, .stTextArea > div > div, .stNumberInput > div > div {{
+    background-color: #f1f8e9;
+    border-radius: 5px;
+    color: black;
+}}
+.stRadio > label, .stSelectbox > label {{
+    color: {primary_color};
+}}
+</style>
+""", unsafe_allow_html=True)
 
-# --- Halaman Beranda ---
-if menu == "Beranda":
-    st.markdown("<h1 style='text-align: center;'>CryptoSim Pro 🛡️</h1>", unsafe_allow_html=True)
-    st.markdown("### 👋 Selamat Datang di CryptoSim Pro!")
+# Judul
+st.markdown("<h1 style='text-align: center;'>CryptoSim Pro 🛡️</h1>", unsafe_allow_html=True)
+
+# Inisialisasi sesi
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+# Fungsi log riwayat
+def log_history(alg, mode, input_text, result):
+    st.session_state.history.append({
+        "algoritma": alg,
+        "mode": mode,
+        "input": input_text,
+        "hasil": result,
+        "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    })
+
+# Sidebar menu algoritma
+menu = [
+    "Beranda",
+    "Caesar Cipher",
+    "Vigenère Cipher",
+    "Rail Fence Cipher",
+    "Playfair Cipher",
+    "Hill Cipher",
+    "Beaufort Cipher",
+    "Columnar Transposition Cipher",
+    "LSB Steganography",
+    "ECC",
+    "ChaCha20",
+    "Fernet"
+]
+choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
+
+# Halaman Beranda
+if choice == "Beranda":
+    st.markdown("## 👋 Selamat Datang di **CryptoSim Pro!**")
     st.markdown("""
     Aplikasi ini dibuat untuk memenuhi tugas **UAS Pemrograman Kriptografi**.
 
-    🔐 Gunakan berbagai metode kriptografi klasik & modern.  
-    📁 Simpan hasil & lihat riwayat.  
-    🛡️ Pilih algoritma di sidebar untuk mulai simulasi.
+    🔐 Gunakan berbagai metode kriptografi klasik dan modern untuk proses enkripsi dan dekripsi teks.  
+    📁 Anda juga dapat mengunggah file, menyimpan hasil, menghasilkan QR Code, dan melihat riwayat penggunaan.  
+    🛡️ Silakan pilih algoritma di sidebar untuk memulai simulasi.
     """)
-    st.markdown("<br><center>© 2025 CryptoSim Pro by Badiatul</center>", unsafe_allow_html=True)
 
-# --- Halaman Algoritma ---
-else:
-    try:
-        if menu == "Caesar Cipher":
-            caesar.run(log_history)
-        elif menu == "Vigenère Cipher":
-            vigenere.run(log_history)
-        elif menu == "Rail Fence Cipher":
-            railfence.run(log_history)
-        elif menu == "Playfair Cipher":
-            playfair.run(log_history)
-        elif menu == "Hill Cipher":
-            hill.run(log_history)
-        elif menu == "Beaufort Cipher":
-            beaufort.run(log_history)
-        elif menu == "Columnar Transposition":
-            columnar.run(log_history)
-        elif menu == "LSB Steganography":
-            lsb.run(log_history)
-        elif menu == "ECC":
-            ecc.run(log_history)
-        elif menu == "ChaCha20":
-            chacha20.run(log_history)
-        elif menu == "Fernet":
-            fernet.run(log_history)
+# Jalankan algoritma sesuai pilihan
+elif choice == "Caesar Cipher":
+    caesar.run(log_history)
+elif choice == "Vigenère Cipher":
+    vigenere.run(log_history)
+elif choice == "Rail Fence Cipher":
+    railfence.run(log_history)
+elif choice == "Playfair Cipher":
+    playfair.run(log_history)
+elif choice == "Hill Cipher":
+    hill.run(log_history)
+elif choice == "Beaufort Cipher":
+    beaufort.run(log_history)
+elif choice == "Columnar Transposition Cipher":
+    columnar.run(log_history)
+elif choice == "LSB Steganography":
+    lsb.run(log_history)
+elif choice == "ECC":
+    ecc.run(log_history)
+elif choice == "ChaCha20":
+    chacha20.run(log_history)
+elif choice == "Fernet":
+    fernet.run(log_history)
+
+# Riwayat dan Unduh
+if choice != "Beranda":
+    with st.expander("🕘 Lihat Riwayat"):
+        if st.session_state.history:
+            for item in reversed(st.session_state.history[-10:]):
+                st.markdown(f"""
+                <div style='background-color:#e6ffe6;padding:10px;border-radius:10px;margin-bottom:10px;'>
+                    <strong>{item['timestamp']}</strong><br>
+                    <em>{item['algoritma']}</em> ({item['mode']})<br>
+                    <b>Input:</b> {item['input']}<br>
+                    <b>Hasil:</b> {item['hasil']}
+                </div>
+                """, unsafe_allow_html=True)
         else:
-            st.error("❌ Algoritma tidak dikenali.")
-    except AttributeError as e:
-        st.error(f"❌ File algoritma belum punya fungsi `run()`: {e}")
-    except Exception as e:
-        st.error(f"❌ Gagal menjalankan algoritma: {e}")
+            st.info("Belum ada riwayat.")
 
-# --- Fungsi QR Code (opsional) ---
-def generate_qr(data):
-    qr = qrcode.make(data)
-    return qr
+    with st.expander("⬇️ Unduh Hasil & QR Code"):
+        if st.session_state.history:
+            last = st.session_state.history[-1]
+            hasil = str(last["hasil"])
+            filename = f"{last['algoritma'].replace(' ', '_')}_{last['mode'].lower()}_{datetime.datetime.now().strftime('%H%M%S')}.txt"
 
-# --- Akhiri body tag ---
-st.markdown("</body>", unsafe_allow_html=True)
+            st.download_button("📄 Unduh Hasil Terakhir", data=hasil, file_name=filename, mime="text/plain")
+
+            qr = qrcode.make(hasil)
+            buf = BytesIO()
+            qr.save(buf)
+            st.image(buf.getvalue(), caption="QR Code dari hasil", use_container_width=True)
+        else:
+            st.warning("Belum ada hasil yang bisa diunduh.")
+
+# Footer
+st.markdown(f"<p style='text-align: center; color: grey;'>© 2025 CryptoSim Pro by Badiatul</p>", unsafe_allow_html=True)
