@@ -1,5 +1,3 @@
-# app.py - Versi lengkap dengan fitur tambahan
-
 import streamlit as st
 import datetime
 import qrcode
