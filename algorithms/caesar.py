@@ -1,3 +1,5 @@
+# algorithms/caesar.py
+
 import streamlit as st
 
 def caesar_cipher(text, key, mode):
@@ -13,14 +15,6 @@ def caesar_cipher(text, key, mode):
 
 def run(log_history):
     st.header("🔐 Caesar Cipher")
-    st.markdown("""
-    Caesar Cipher adalah metode kriptografi klasik yang menggeser setiap huruf dalam teks
-    sebanyak `k` posisi. Misalnya, jika `k = 3`, maka `A` menjadi `D`, `B` menjadi `E`, dst.
-
-    - Gunakan **Enkripsi** untuk menyandikan pesan.
-    - Gunakan **Dekripsi** untuk mengembalikan pesan semula.
-    """)
-
     mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
     text = st.text_area("📝 Masukkan Teks")
     key = st.number_input("🔑 Kunci (angka)", min_value=1, max_value=25, value=3)
