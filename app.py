@@ -15,7 +15,7 @@ st.markdown("<h1 style='text-align: center; color: black;'>CryptoSim Pro 🛡️
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# Fungsi untuk mencatat riwayat
+# Fungsi log riwayat
 def log_history(alg, mode, input_text, result):
     st.session_state.history.append({
         "algoritma": alg,
@@ -25,7 +25,7 @@ def log_history(alg, mode, input_text, result):
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     })
 
-# Sidebar Menu
+# Sidebar menu
 menu = [
     "Beranda",
     "Caesar Cipher",
@@ -43,7 +43,7 @@ menu = [
 ]
 choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
 
-# Beranda
+# Tampilan Beranda
 if choice == "Beranda":
     st.markdown("## 👋 Selamat Datang di **CryptoSim Pro!**")
     st.markdown("""
@@ -54,7 +54,7 @@ if choice == "Beranda":
     🛡️ Silakan pilih algoritma di sidebar untuk memulai simulasi.
     """)
 
-# Challenge Mode
+# Mode Tantangan
 elif choice == "🎮 Challenge Mode":
     st.markdown("## 🎯 Tantangan Kriptografi")
     soal = "UJIAN AKHIR SUDAH DEKAT"
@@ -67,7 +67,7 @@ elif choice == "🎮 Challenge Mode":
     elif jawaban:
         st.error("❌ Masih salah, coba lagi!")
 
-# Algoritma-algoritma
+# Jalankan algoritma
 elif choice == "Caesar Cipher":
     caesar.run(log_history)
 elif choice == "Vigenère Cipher":
@@ -91,7 +91,7 @@ elif choice == "ChaCha20":
 elif choice == "Fernet":
     fernet.run(log_history)
 
-# Riwayat + Unduhan
+# Riwayat & Unduh + QR Code
 if choice != "Beranda":
     with st.expander("🕘 Lihat Riwayat"):
         if st.session_state.history:
@@ -110,22 +110,22 @@ if choice != "Beranda":
     with st.expander("⬇️ Unduh Hasil & QR Code"):
         if st.session_state.history:
             last = st.session_state.history[-1]
-            filename = f"{last['algoritma'].replace(' ', '_')}_{last['mode'].lower()}_{datetime.datetime.now().strftime('%H%M%S')}.txt"
             hasil = str(last["hasil"])
+            filename = f"{last['algoritma'].replace(' ', '_')}_{last['mode'].lower()}_{datetime.datetime.now().strftime('%H%M%S')}.txt"
 
             st.download_button("📄 Unduh Hasil Terakhir", data=hasil, file_name=filename, mime="text/plain")
 
             qr = qrcode.make(hasil)
             buf = BytesIO()
             qr.save(buf)
-            st.image(buf.getvalue(), caption="QR Code dari hasil", use_column_width=False)
+            st.image(buf.getvalue(), caption="QR Code dari hasil", use_container_width=False)
         else:
             st.warning("Belum ada hasil yang bisa diunduh.")
 
 # Footer
 st.markdown("<p style='text-align: center; color: grey;'>© 2025 CryptoSim Pro by Badiatul</p>", unsafe_allow_html=True)
 
-# Gaya
+# CSS Style
 st.markdown("""
 <style>
 body {
