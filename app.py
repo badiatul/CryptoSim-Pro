@@ -9,7 +9,62 @@ from algorithms import (
 
 # Konfigurasi Halaman
 st.set_page_config(page_title="CryptoSim Pro", layout="centered", page_icon="🛡️")
-st.markdown("<h1 style='text-align: center; color: black;'>CryptoSim Pro 🛡️</h1>", unsafe_allow_html=True)
+
+# Toggle Mode Gelap/Terang
+mode = st.sidebar.toggle("🌙 Mode Gelap", value=False)
+
+# Tema berdasarkan mode
+primary_color = "#004d40" if not mode else "#ffffff"
+background_color = "#e0f2f1" if not mode else "#121212"
+sidebar_color = "#b2dfdb" if not mode else "#1e1e1e"
+font_color = "#004d40" if not mode else "#e0f7fa"
+button_color = "#26a69a" if not mode else "#2e8b57"
+hover_color = "#00796b" if not mode else "#43a047"
+
+# Gaya CSS dinamis
+st.markdown(f"""
+<style>
+body {{
+    background-color: {background_color};
+}}
+[data-testid="stSidebar"] {{
+    background-color: {sidebar_color};
+}}
+h1, h2, h3, h4, h5, h6, p {{
+    color: {primary_color};
+}}
+.stButton > button {{
+    background-color: {button_color};
+    color: white;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    padding: 0.5em 1em;
+}}
+.stButton > button:hover {{
+    background-color: {hover_color};
+}}
+.stAlert > div {{
+    background-color: {sidebar_color} !important;
+    color: {primary_color} !important;
+}}
+div[data-testid="stExpander"] > div > div {{
+    background-color: {background_color} !important;
+    border-radius: 10px;
+}}
+input, textarea, .stTextInput > div > div, .stTextArea > div > div, .stNumberInput > div > div {{
+    background-color: #f1f8e9;
+    border-radius: 5px;
+    color: black;
+}}
+.stRadio > label, .stSelectbox > label {{
+    color: {primary_color};
+}}
+</style>
+""", unsafe_allow_html=True)
+
+# Judul
+st.markdown("<h1 style='text-align: center;'>CryptoSim Pro 🛡️</h1>", unsafe_allow_html=True)
 
 # Inisialisasi sesi
 if "history" not in st.session_state:
@@ -25,7 +80,7 @@ def log_history(alg, mode, input_text, result):
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     })
 
-# Sidebar menu
+# Sidebar menu algoritma
 menu = [
     "Beranda",
     "Caesar Cipher",
@@ -38,36 +93,22 @@ menu = [
     "LSB Steganography",
     "ECC",
     "ChaCha20",
-    "Fernet",
-    "🎮 Challenge Mode"
+    "Fernet"
 ]
 choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
 
-# Tampilan Beranda
+# Halaman Beranda
 if choice == "Beranda":
     st.markdown("## 👋 Selamat Datang di **CryptoSim Pro!**")
     st.markdown("""
     Aplikasi ini dibuat untuk memenuhi tugas **UAS Pemrograman Kriptografi**.
 
     🔐 Gunakan berbagai metode kriptografi klasik dan modern untuk proses enkripsi dan dekripsi teks.  
-    📁 Anda juga dapat mengunggah file, menyimpan hasil, menghasilkan QR Code, dan mencoba tantangan.  
+    📁 Anda juga dapat mengunggah file, menyimpan hasil, menghasilkan QR Code, dan melihat riwayat penggunaan.  
     🛡️ Silakan pilih algoritma di sidebar untuk memulai simulasi.
     """)
 
-# Mode Tantangan
-elif choice == "🎮 Challenge Mode":
-    st.markdown("## 🎯 Tantangan Kriptografi")
-    soal = "UJIAN AKHIR SUDAH DEKAT"
-    st.write(f"Teks berikut telah dienkripsi dengan Caesar (shift=3):")
-    chiper = caesar.encrypt(soal, 3)
-    st.code(chiper)
-    jawaban = st.text_input("Apa hasil dekripsinya?")
-    if jawaban.strip().upper() == soal:
-        st.success("✅ Benar!")
-    elif jawaban:
-        st.error("❌ Masih salah, coba lagi!")
-
-# Jalankan algoritma
+# Jalankan algoritma sesuai pilihan
 elif choice == "Caesar Cipher":
     caesar.run(log_history)
 elif choice == "Vigenère Cipher":
@@ -91,7 +132,7 @@ elif choice == "ChaCha20":
 elif choice == "Fernet":
     fernet.run(log_history)
 
-# Riwayat & Unduh + QR Code
+# Riwayat dan Unduh
 if choice != "Beranda":
     with st.expander("🕘 Lihat Riwayat"):
         if st.session_state.history:
@@ -118,50 +159,9 @@ if choice != "Beranda":
             qr = qrcode.make(hasil)
             buf = BytesIO()
             qr.save(buf)
-            st.image(buf.getvalue(), caption="QR Code dari hasil", use_container_width=False)
+            st.image(buf.getvalue(), caption="QR Code dari hasil", use_container_width=True)
         else:
             st.warning("Belum ada hasil yang bisa diunduh.")
 
 # Footer
-st.markdown("<p style='text-align: center; color: grey;'>© 2025 CryptoSim Pro by Badiatul</p>", unsafe_allow_html=True)
-
-# CSS Style
-st.markdown("""
-<style>
-body {
-    background-color: #e0f2f1;
-}
-[data-testid="stSidebar"] {
-    background-color: #b2dfdb;
-}
-h1, h2, h3, h4, h5, h6, p {
-    color: #004d40;
-}
-.stButton > button {
-    background-color: #26a69a;
-    color: white;
-    border-radius: 8px;
-    border: none;
-    font-weight: bold;
-    padding: 0.5em 1em;
-}
-.stButton > button:hover {
-    background-color: #00796b;
-}
-.stAlert > div {
-    background-color: #b2dfdb !important;
-    color: #004d40 !important;
-}
-div[data-testid="stExpander"] > div > div {
-    background-color: #e0f2f1 !important;
-    border-radius: 10px;
-}
-input, textarea, .stTextInput > div > div, .stTextArea > div > div, .stNumberInput > div > div {
-    background-color: #f1f8e9;
-    border-radius: 5px;
-}
-.stRadio > label, .stSelectbox > label {
-    color: #004d40;
-}
-</style>
-""", unsafe_allow_html=True)
+st.markdown(f"<p style='text-align: center; color: grey;'>© 2025 CryptoSim Pro by Badiatul</p>", unsafe_allow_html=True)
