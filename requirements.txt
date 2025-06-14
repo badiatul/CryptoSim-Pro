@@ -1,7 +1,5 @@
 streamlit
-qrcode
 Pillow
+qrcode
 cryptography
-pycryptodome
 numpy
-matplotlib
