@@ -13,6 +13,7 @@ def caesar_cipher(text, key, mode):
 
 def run(log_history):
     st.header("🔐 Caesar Cipher")
+     st.write("Fitur ini sedang dikembangkan.")
     st.markdown("""
     Caesar Cipher adalah metode kriptografi klasik yang menggeser setiap huruf dalam teks
     sebanyak `k` posisi. Misalnya, jika `k = 3`, maka `A` menjadi `D`, `B` menjadi `E`, dst.
