@@ -27,3 +27,7 @@ def run(log_history):
         st.success(f"Hasil {mode}:")
         st.code(result)
         log_history("Caesar Cipher", mode, text, result)
+        qr = qrcode.make(result)
+        buf = io.BytesIO()
+        qr.save(buf, format="PNG")
+        st.image(buf.getvalue(), caption="QR Code dari hasil", use_column_width=False)
