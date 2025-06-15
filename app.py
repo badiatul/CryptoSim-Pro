@@ -5,6 +5,9 @@ from algorithms import caesar, vigenere, railfence, playfair, hill, beaufort, co
 # Konfigurasi halaman
 st.set_page_config(page_title="CrypTosca", layout="centered", page_icon="🛡️")
 
+# Toggle mode gelap
+mode = st.sidebar.toggle("🌙 Mode Gelap", value=False)
+
 if mode:
     st.markdown("""
         <style>
@@ -62,7 +65,7 @@ if choice == "Beranda":
     <p style='text-align: center; font-style: italic; color: #555;'>Aplikasi ini dibuat untuk memenuhi tugas UAS Pemrograman Kriptografi</p>
     <hr style='margin-top: 10px; margin-bottom: 20px;'>
     <ul style='line-height: 1.8; font-size: 16px;'>
-        <li>🔐 Gunakan beberapa algoritma kriptografi klasik dan modern</li>
+        <li>🔐 Gunakan berbagai algoritma kriptografi klasik dan modern</li>
         <li>📁 Unggah file, lihat hasil, download, dan dapatkan QR Code</li>
         <li>🚀 Silakan pilih algoritma di sidebar untuk memulai</li>
     </ul>
