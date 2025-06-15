@@ -35,4 +35,4 @@ def run(log_history):
         qr = qrcode.make(result)
         buf = io.BytesIO()
         qr.save(buf, format="PNG")
-        st.image(buf.getvalue(), caption="QR Code dari hasil", use_column_width=False)
+        st.image(buf.getvalue(), caption="QR Code dari hasil", use_container_width=False)
