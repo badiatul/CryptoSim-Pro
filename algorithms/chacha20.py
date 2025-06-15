@@ -63,3 +63,9 @@ def run(log_history):
                     log_history("ChaCha20", "Dekripsi", f"Nonce: {nonce_b64}, Ciphertext: {ciphertext_b64}", decrypted)
                 except Exception as e:
                     st.error(f"❌ Gagal dekripsi: {e}")
+
+                    # QR Code result
+                    qr = qrcode.make(result)
+                    buf = io.BytesIO()
+                    qr.save(buf, format="PNG")
+                    st.image(buf.getvalue(), caption="QR Code dari hasil", use_container_width=False)
