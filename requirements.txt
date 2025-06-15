@@ -6,3 +6,4 @@ cryptography
 numpy
 matplotlib
 tinyec
+pycryptodome
