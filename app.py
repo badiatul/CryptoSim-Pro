@@ -45,7 +45,7 @@ if choice == "Beranda":
     st.markdown("""
     ### 👋 Selamat Datang di CrypTosca Pro!
 
-    - Gunakan berbagai algoritma kriptografi klasik dan modern  
+    - Gunakan beberapa algoritma kriptografi klasik dan modern  
     - Unggah file, lihat hasil, download, dan dapatkan QR Code  
     - Silakan pilih algoritma di sidebar untuk memulai
 
