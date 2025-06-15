@@ -33,3 +33,9 @@ def run(log_history):
         st.success("Hasil:")
         st.code(result)
         log_history("Beaufort Cipher", "Enkripsi/Dekripsi", text, result)
+        
+        # QR Code result
+        qr = qrcode.make(result)
+        buf = io.BytesIO()
+        qr.save(buf, format="PNG")
+        st.image(buf.getvalue(), caption="QR Code dari hasil", use_container_width=False)
