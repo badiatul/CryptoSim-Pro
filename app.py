@@ -45,7 +45,7 @@ if choice == "Beranda":
     st.markdown("""
     ### 👋 Selamat Datang di CrypTosca!
 
-    - Gunakan beberapa algoritma kriptografi klasik dan modern  
+    - Gunakan beberapa algoritma kriptografi klasik dan modern untuk enkripsi maupun dekripsi  
     - Unggah file, tulis kata atau kalimat, lihat hasil enkripsi atau dekripsi, download, dan dapatkan QR Code  
     - Silakan pilih algoritma di sidebar untuk memulai
 
