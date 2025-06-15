@@ -5,9 +5,6 @@ from algorithms import caesar, vigenere, railfence, playfair, hill, beaufort, co
 # Konfigurasi halaman
 st.set_page_config(page_title="CrypTosca", layout="centered", page_icon="🛡️")
 
-# Toggle mode gelap
-mode = st.sidebar.toggle("🌙 Mode Gelap", value=False)
-
 if mode:
     st.markdown("""
         <style>
