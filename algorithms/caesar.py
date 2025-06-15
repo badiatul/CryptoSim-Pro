@@ -1,32 +1,37 @@
-# algorithms/caesar.py
-
 import streamlit as st
+import qrcode
+import io
+from PIL import Image
 
-def caesar_cipher(text, key, mode):
+def encrypt(text, shift):
     result = ""
     for char in text:
         if char.isalpha():
-            shift = key if mode == "Enkripsi" else -key
             base = ord('A') if char.isupper() else ord('a')
             result += chr((ord(char) - base + shift) % 26 + base)
         else:
             result += char
     return result
 
+def decrypt(text, shift):
+    return encrypt(text, -shift)
+
 def run(log_history):
     st.header("🔐 Caesar Cipher")
-    mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("📝 Masukkan Teks")
-    key = st.number_input("🔑 Kunci (angka)", min_value=1, max_value=25, value=3)
+    text = st.text_area("Masukkan teks:")
+    shift = st.number_input("Shift:", 1, 25, 3)
+    mode = st.radio("Pilih mode:", ["Enkripsi", "Dekripsi"])
 
-    if st.button("🚀 Jalankan Caesar Cipher"):
-        if not text.strip():
-            st.warning("Teks tidak boleh kosong.")
-            return
-        result = caesar_cipher(text, key, mode)
-        st.success(f"Hasil {mode}:")
-        st.code(result)
+    if st.button("Proses"):
+        if mode == "Enkripsi":
+            result = encrypt(text, shift)
+        else:
+            result = decrypt(text, shift)
+
+        st.success(result)
         log_history("Caesar Cipher", mode, text, result)
+
+        # QR Code result
         qr = qrcode.make(result)
         buf = io.BytesIO()
         qr.save(buf, format="PNG")
