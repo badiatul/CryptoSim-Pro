@@ -1,5 +1,12 @@
+"""
+ECC Encryption/Decryption Module untuk CrypTosca Pro
+Menggunakan kurva eliptik brainpoolP256r1 dan XOR sederhana untuk demonstrasi enkripsi simetris berbasis shared secret.
+"""
+
 import streamlit as st
 import base64
+import qrcode
+import io
 from tinyec import registry
 import secrets
 
@@ -24,18 +31,15 @@ def run(log_history):
     st.markdown("## 🔐 ECC Encryption / Decryption")
 
     st.info("""
+📌 **Tentang ECC:**
+- Kriptografi modern berbasis kurva eliptik
+- Aman dengan kunci pendek
+- Cocok untuk IoT dan perangkat mobile
+- Gunakan `XOR` untuk mendemokan konsep shared secret dari ECC
 
-ECC adalah metode kriptografi modern yang menggunakan kurva eliptik untuk mengenkripsi dan mendekripsi data.
-
-🧠 **Keunggulan ECC**:
-- Keamanan tinggi meski dengan kunci pendek
-- Proses lebih cepat dan ringan
-- Cocok untuk perangkat terbatas (IoT, mobile)
-
-ECC bekerja dengan:
+🔐 ECC menggunakan:
 - **Private Key**: angka acak rahasia
-- **Public Key**: hasil dari operasi private key × titik awal kurva (G)
-- **Shared Secret**: digunakan untuk mengenkripsi teks (dengan XOR untuk demo ini)
+- **Public Key**: hasil dari private key × titik awal kurva (G)
 """)
 
     st.markdown("### 🧮 Generate Key Pair")
@@ -56,9 +60,17 @@ ECC bekerja dengan:
                 encrypted = ecc_encrypt(pubKey, plaintext)
                 st.success("✅ Enkripsi berhasil!")
                 st.code(encrypted, language="text")
+
+                # QR Code dari hasil
+                qr = qrcode.make(encrypted)
+                buf = io.BytesIO()
+                qr.save(buf, format="PNG")
+                st.image(buf.getvalue(), caption="📌 QR Code dari hasil", use_container_width=False)
+
                 log_history("ECC", "Enkripsi", plaintext, encrypted)
             else:
                 st.warning("Masukkan teks untuk dienkripsi.")
+
     else:
         ciphertext_b64 = st.text_area("📥 Masukkan ciphertext (base64) untuk didekripsi")
         if st.button("🔓 Dekripsi"):
@@ -67,6 +79,13 @@ ECC bekerja dengan:
                     decrypted = ecc_decrypt(privKey, ciphertext_b64)
                     st.success("✅ Dekripsi berhasil!")
                     st.code(decrypted, language="text")
+
+                    # QR Code dari hasil
+                    qr = qrcode.make(decrypted)
+                    buf = io.BytesIO()
+                    qr.save(buf, format="PNG")
+                    st.image(buf.getvalue(), caption="📌 QR Code dari hasil", use_container_width=False)
+
                     log_history("ECC", "Dekripsi", ciphertext_b64, decrypted)
                 except Exception as e:
                     st.error(f"❌ Gagal dekripsi: {e}")
