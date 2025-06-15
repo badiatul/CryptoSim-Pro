@@ -80,7 +80,7 @@ def run(log_history):
             try:
                 encoded_img = embed_message(image, message)
                 st.success("✅ Pesan berhasil disisipkan!")
-                st.image(encoded_img, caption="📸 Gambar Hasil Enkripsi", use_column_width=True)
+                st.image(encoded_img, caption="📸 Gambar Hasil Enkripsi", use_container_width=True)
 
                 # Simpan ke buffer
                 buf = io.BytesIO()
