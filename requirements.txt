@@ -5,3 +5,4 @@ qrcode
 cryptography
 numpy
 matplotlib
+tinyec
