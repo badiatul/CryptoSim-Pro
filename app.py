@@ -46,7 +46,7 @@ if choice == "Beranda":
     ### 👋 Selamat Datang di CrypTosca Pro!
 
     - Gunakan beberapa algoritma kriptografi klasik dan modern  
-    - Unggah file, lihat hasil, download, dan dapatkan QR Code  
+    - Unggah file, tulis kata atau kalimat, lihat hasil, download, dan dapatkan QR Code  
     - Silakan pilih algoritma di sidebar untuk memulai
 
     **Aplikasi ini dibuat untuk memenuhi tugas UAS Pemrograman Kriptografi**
