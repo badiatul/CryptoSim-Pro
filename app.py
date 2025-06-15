@@ -5,26 +5,8 @@ from algorithms import caesar, vigenere, railfence, playfair, hill, beaufort, co
 # Konfigurasi halaman
 st.set_page_config(page_title="CrypTosca", layout="centered", page_icon="🛡️")
 
-# Toggle mode gelap
-mode = st.sidebar.toggle("🌙 Mode Gelap", value=False)
-
-if mode:
-    st.markdown("""
-        <style>
-            body { background-color: #0d3b3e; color: white; }
-        </style>
-    """, unsafe_allow_html=True)
-else:
-    st.markdown("""
-        <style>
-            body { background-color: #e6f7f5; color: black; }
-        </style>
-    """, unsafe_allow_html=True)
-
 # Judul utama
-st.markdown("""
-<h1 style='text-align: center;'>CrypTosca Pro 🛡️</h1>
-""", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>CrypTosca Pro 🛡️</h1>", unsafe_allow_html=True)
 
 # Inisialisasi sesi riwayat
 if "history" not in st.session_state:
@@ -61,14 +43,13 @@ choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
 # Konten Beranda
 if choice == "Beranda":
     st.markdown("""
-    <h2 style='text-align: center;'>👋 Selamat Datang di CrypTosca Pro!</h2>
-    <p style='text-align: center; font-style: italic; color: #555;'>Aplikasi ini dibuat untuk memenuhi tugas UAS Pemrograman Kriptografi</p>
-    <hr style='margin-top: 10px; margin-bottom: 20px;'>
-    <ul style='line-height: 1.8; font-size: 16px;'>
-        <li>🔐 Gunakan beberapa algoritma kriptografi klasik dan modern</li>
-        <li>📁 Unggah file, lihat hasil, download, dan dapatkan QR Code</li>
-        <li>🚀 Silakan pilih algoritma di sidebar untuk memulai</li>
-    </ul>
+    ### 👋 Selamat Datang di CrypTosca Pro!
+
+    - Gunakan berbagai algoritma kriptografi klasik dan modern  
+    - Unggah file, lihat hasil, download, dan dapatkan QR Code  
+    - Silakan pilih algoritma di sidebar untuk memulai
+
+    **Aplikasi ini dibuat untuk memenuhi tugas UAS Pemrograman Kriptografi**
     """, unsafe_allow_html=True)
 
 # Menjalankan algoritma sesuai pilihan
