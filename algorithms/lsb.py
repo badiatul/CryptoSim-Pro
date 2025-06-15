@@ -1,3 +1,8 @@
+"""
+LSB (Least Significant Bit) Steganography Module for CrypTosca
+Menyisipkan dan mengekstrak pesan teks dari gambar PNG menggunakan manipulasi bit terakhir (kanal biru).
+"""
+
 import streamlit as st
 from PIL import Image
 import numpy as np
@@ -42,19 +47,17 @@ def extract_message(img: Image.Image) -> str:
 def run(log_history):
     st.header("🖼️ LSB Steganography")
     st.markdown("""
-    LSB (Least Significant Bit) Steganografi adalah teknik menyisipkan data ke dalam citra digital  
-    dengan mengganti bit terakhir dari kanal warna (umumnya kanal biru) pada setiap piksel.
+    LSB (**Least Significant Bit**) Steganografi adalah teknik menyisipkan data ke dalam citra digital  
+    dengan mengganti **bit terakhir** dari kanal warna (umumnya **kanal biru**) di setiap piksel.
 
-    - **Mode Enkripsi** akan menyisipkan pesan teks ke dalam gambar.
-    - **Mode Dekripsi** akan membaca pesan tersembunyi dari gambar yang telah disisipkan.
+    - 📥 **Enkripsi**: Menyisipkan pesan teks ke dalam gambar PNG.
+    - 📤 **Dekripsi**: Mengekstrak kembali pesan dari gambar yang telah dimodifikasi.
 
-    ⚠️ Ukuran gambar harus cukup untuk menampung pesan.
+    ⚠️ Pastikan gambar memiliki resolusi cukup untuk menampung seluruh pesan.
     """)
 
-    mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
-
-    uploaded_file = st.file_uploader("📁 Unggah Gambar (PNG)", type=["png"])
-    message = ""
+    mode = st.radio("📌 Pilih Mode", ["Enkripsi", "Dekripsi"])
+    uploaded_file = st.file_uploader("📁 Unggah Gambar (format PNG saja)", type=["png"])
 
     if mode == "Enkripsi":
         message = st.text_area("💬 Masukkan Pesan yang Ingin Disisipkan", max_chars=1000)
@@ -77,16 +80,16 @@ def run(log_history):
             try:
                 encoded_img = embed_message(image, message)
                 st.success("✅ Pesan berhasil disisipkan!")
-                st.image(encoded_img, caption="Gambar Hasil Enkripsi", use_column_width=True)
+                st.image(encoded_img, caption="📸 Gambar Hasil Enkripsi", use_column_width=True)
 
-                # Simpan ke buffer untuk diunduh
+                # Simpan ke buffer
                 buf = io.BytesIO()
                 encoded_img.save(buf, format="PNG")
                 byte_img = buf.getvalue()
 
                 st.download_button("⬇️ Unduh Gambar Hasil", data=byte_img, file_name="hasil_lsb.png", mime="image/png")
-
                 log_history("LSB Steganography", "Enkripsi", message, "[Gambar terenkripsi]")
+
             except Exception as e:
                 st.error(f"Gagal menyisipkan pesan: {e}")
 
