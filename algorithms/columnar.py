@@ -2,88 +2,88 @@ import streamlit as st
 import qrcode
 import io
 from PIL import Image
+import math
 
-def columnar_encrypt(plaintext, key):
-    key_order = sorted(list(key))
+def encrypt_columnar(text, key):
+    key_order = sorted(list(enumerate(key)), key=lambda x: x[1])
     num_cols = len(key)
-    num_rows = (len(plaintext) + num_cols - 1) // num_cols
-    padded = plaintext.ljust(num_cols * num_rows)
-    matrix = [list(padded[i:i + num_cols]) for i in range(0, len(padded), num_cols)]
+    num_rows = math.ceil(len(text) / num_cols)
+    padded_text = text.ljust(num_cols * num_rows)
+
+    matrix = [padded_text[i:i + num_cols] for i in range(0, len(padded_text), num_cols)]
     ciphertext = ''
-    for char in key_order:
-        col_idx = key.index(char)
+
+    for idx, _ in key_order:
         for row in matrix:
-            ciphertext += row[col_idx]
+            ciphertext += row[idx]
     return ciphertext
 
-def columnar_decrypt(ciphertext, key):
-    key_order = sorted(list(key))
+def decrypt_columnar(ciphertext, key):
+    key_order = sorted(list(enumerate(key)), key=lambda x: x[1])
     num_cols = len(key)
-    num_rows = (len(ciphertext) + num_cols - 1) // num_cols
-    num_full_cols = len(ciphertext) % num_cols
-    if num_full_cols == 0:
-        num_full_cols = num_cols
+    num_rows = math.ceil(len(ciphertext) / num_cols)
 
     col_lengths = [num_rows] * num_cols
-    for i in range(num_cols):
-        if key_order[i] in key[num_full_cols:]:
-            col_lengths[key.index(key_order[i])] -= 1
+    total_cells = num_rows * num_cols
+    extra_cells = total_cells - len(ciphertext)
 
-    col_data = {}
-    k = 0
-    for char in key_order:
-        idx = key.index(char)
-        col_data[idx] = list(ciphertext[k:k + col_lengths[idx]])
-        k += col_lengths[idx]
+    for i in range(extra_cells):
+        col_lengths[key_order[-(i + 1)][0]] -= 1
+
+    matrix = [''] * num_cols
+    pos = 0
+    for idx, _ in key_order:
+        length = col_lengths[idx]
+        matrix[idx] = ciphertext[pos:pos + length]
+        pos += length
 
     plaintext = ''
     for i in range(num_rows):
-        for j in range(num_cols):
-            if i < len(col_data[j]):
-                plaintext += col_data[j][i]
-    return plaintext.strip()
+        for col in matrix:
+            if i < len(col):
+                plaintext += col[i]
+    return plaintext.rstrip()
 
 def run(log_history):
     st.header("🔐 Columnar Transposition Cipher")
     st.markdown("""
-    Columnar Transposition Cipher mengenkripsi teks dengan menulis dalam baris sesuai jumlah kolom kunci, lalu membacanya kolom per kolom sesuai urutan abjad dari kunci.
-    
-    - **Contoh kunci:** `KEYWORD`, `SECRET`, `CIPHER`
+    Columnar Transposition Cipher menyusun huruf pesan ke dalam baris sesuai panjang kunci,  
+    lalu membaca berdasarkan urutan abjad kunci secara kolom.
+
+    - Misal kunci: `ZEBRA`, maka urutan kolom: `1 3 4 2 0` (berdasarkan abjad).
+    - Karakter kosong diisi spasi jika perlu.
     """)
 
     mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
-    text = st.text_area("📝 Masukkan Teks", height=150)
-    key = st.text_input("🔑 Masukkan Kunci (huruf tanpa spasi)", max_chars=20)
+    text = st.text_area("📝 Masukkan Teks")
+    key = st.text_input("🔑 Masukkan Kunci (huruf saja)")
 
-    if st.button(f"🚀 Jalankan {mode}"):
-        if not text.strip() or not key.strip():
-            st.warning("Teks dan kunci tidak boleh kosong.")
+    if st.button(f"🚀 Jalankan Columnar {mode}"):
+        if not text.strip() or not key.strip().isalpha():
+            st.warning("Teks dan kunci harus valid dan tidak kosong.")
             return
 
         try:
-            if mode == "Enkripsi":
-                result = columnar_encrypt(text.replace(" ", ""), key)
-            else:
-                result = columnar_decrypt(text.replace(" ", ""), key)
-
+            result = encrypt_columnar(text.replace(" ", ""), key) if mode == "Enkripsi" else decrypt_columnar(text, key)
             st.success(f"Hasil {mode}:")
-            st.code(result)
+            st.code(result, language="text")
 
-            log_history("Columnar Transposition Cipher", mode, text, result)
-
-            # 🔳 Tambahkan QR Code jika mode Enkripsi
+            # QR Code hanya saat enkripsi
             if mode == "Enkripsi":
                 qr = qrcode.QRCode(version=1, box_size=10, border=4)
                 qr.add_data(result)
                 qr.make(fit=True)
-                img_qr = qr.make_image(fill_color="black", back_color="white")
+                img_qr = qr.make_image(fill_color="black", back_color="white").convert("RGB")
 
+                # Simpan ke buffer
                 buf = io.BytesIO()
                 img_qr.save(buf, format="PNG")
                 byte_qr = buf.getvalue()
 
                 st.image(img_qr, caption="📷 QR Code dari Hasil Enkripsi", use_container_width=True)
                 st.download_button("⬇️ Unduh QR Code", data=byte_qr, file_name="columnar_qrcode.png", mime="image/png")
+
+            log_history("Columnar Transposition Cipher", mode, text, result)
 
         except Exception as e:
             st.error(f"Terjadi kesalahan: {e}")
