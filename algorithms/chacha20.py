@@ -7,6 +7,8 @@ import streamlit as st
 from Crypto.Cipher import ChaCha20
 from Crypto.Random import get_random_bytes
 import base64
+import qrcode
+import io
 
 def chacha20_encrypt(key, plaintext):
     cipher = ChaCha20.new(key=key)
@@ -49,9 +51,19 @@ def run(log_history):
             if st.button("🔒 Enkripsi"):
                 result = chacha20_encrypt(key, plaintext)
                 st.success("✅ Enkripsi berhasil!")
-                st.code(f"Nonce: {result['nonce']}\nCiphertext: {result['ciphertext']}")
-                log_history("ChaCha20", "Enkripsi", plaintext, f"Nonce: {result['nonce']}, Ciphertext: {result['ciphertext']}")
-        
+
+                hasil = f"Nonce: {result['nonce']}\nCiphertext: {result['ciphertext']}"
+                st.code(hasil)
+
+                # Simpan riwayat
+                log_history("ChaCha20", "Enkripsi", plaintext, hasil)
+
+                # Tampilkan QR Code
+                qr = qrcode.make(hasil)
+                buf = io.BytesIO()
+                qr.save(buf, format="PNG")
+                st.image(buf.getvalue(), caption="📌 QR Code dari hasil enkripsi", use_container_width=False)
+
         else:
             nonce_b64 = st.text_input("📥 Masukkan Nonce (base64)")
             ciphertext_b64 = st.text_area("📥 Masukkan Ciphertext (base64)")
@@ -60,12 +72,8 @@ def run(log_history):
                     decrypted = chacha20_decrypt(key, nonce_b64, ciphertext_b64)
                     st.success("✅ Dekripsi berhasil!")
                     st.code(decrypted)
+
                     log_history("ChaCha20", "Dekripsi", f"Nonce: {nonce_b64}, Ciphertext: {ciphertext_b64}", decrypted)
+
                 except Exception as e:
                     st.error(f"❌ Gagal dekripsi: {e}")
-
-                    # QR Code result
-                    qr = qrcode.make(result)
-                    buf = io.BytesIO()
-                    qr.save(buf, format="PNG")
-                    st.image(buf.getvalue(), caption="QR Code dari hasil", use_container_width=False)
