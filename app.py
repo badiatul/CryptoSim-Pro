@@ -6,7 +6,7 @@ from algorithms import caesar, vigenere, railfence, playfair, hill, beaufort, co
 st.set_page_config(page_title="CrypTosca", layout="centered", page_icon="🛡️")
 
 # Judul utama
-st.markdown("<h1 style='text-align: center;'>CrypTosca Pro 🛡️</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>CrypTosca 🛡️</h1>", unsafe_allow_html=True)
 
 # Inisialisasi sesi riwayat
 if "history" not in st.session_state:
@@ -43,7 +43,7 @@ choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
 # Konten Beranda
 if choice == "Beranda":
     st.markdown("""
-    ### 👋 Selamat Datang di CrypTosca Pro!
+    ### 👋 Selamat Datang di CrypTosca!
 
     - Gunakan beberapa algoritma kriptografi klasik dan modern  
     - Unggah file, tulis kata atau kalimat, lihat hasil enkripsi atau dekripsi, download, dan dapatkan QR Code  
@@ -114,4 +114,4 @@ if choice != "Beranda":
             st.warning("Belum ada hasil yang bisa diunduh.")
 
 # Footer
-st.markdown("<p style='text-align: center; color: grey;'>© 2025 CrypTosca Pro by Badiatul</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: grey;'>© 2025 CrypTosca by Badiatul</p>", unsafe_allow_html=True)
