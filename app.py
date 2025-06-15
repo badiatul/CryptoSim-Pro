@@ -3,7 +3,7 @@ import datetime
 from algorithms import caesar, vigenere, railfence, playfair, hill, beaufort, columnar, lsb, ecc, chacha20, fernet
 
 # Konfigurasi halaman
-st.set_page_config(page_title="CryptoSim Pro", layout="centered", page_icon="🛡️")
+st.set_page_config(page_title="CrypTosca", layout="centered", page_icon="🛡️")
 
 # Toggle mode gelap
 mode = st.sidebar.toggle("🌙 Mode Gelap", value=False)
@@ -14,7 +14,7 @@ else:
     st.markdown("<style>body { background-color: #e6f7f5; color: black; }</style>", unsafe_allow_html=True)
 
 # Judul utama
-st.markdown("<h1 style='text-align: center;'>CryptoSim Pro 🛡️</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>CrypTosca 🛡️</h1>", unsafe_allow_html=True)
 
 # Inisialisasi sesi riwayat
 if "history" not in st.session_state:
@@ -51,7 +51,7 @@ choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
 
 # Konten Beranda
 if choice == "Beranda":
-    st.markdown("### 👋 Selamat Datang di CryptoSim Pro!\n\n"
+    st.markdown("### 👋 Selamat Datang di CrypTosca!\n\n"
                 "- Gunakan berbagai algoritma kriptografi klasik dan modern\n"
                 "- Unggah file, lihat hasil, download, dan dapatkan QR Code\n"
                 "- Silakan pilih algoritma di sidebar untuk memulai", unsafe_allow_html=True)
@@ -118,4 +118,4 @@ if choice != "Beranda":
             st.warning("Belum ada hasil yang bisa diunduh.")
 
 # Footer
-st.markdown("<p style='text-align: center; color: grey;'>© 2025 CryptoSim Pro by Badiatul</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: grey;'>© 2025 CrypTosca by Badiatul</p>", unsafe_allow_html=True)
