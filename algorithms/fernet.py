@@ -1,29 +1,29 @@
 """
-Fernet Encryption/Decryption Module for CryptoSim Pro
-Menggunakan kunci simetris 32-byte base64. Mendukung generate otomatis dan copy-paste manual.
+Fernet Encryption/Decryption Module for CrypTosca Pro
+Menggunakan kunci simetris 32-byte (base64). Mendukung generate otomatis dan copy-paste manual.
 """
 
 import streamlit as st
 from cryptography.fernet import Fernet
+import qrcode
+import io
 
 def run(log_history):
     st.markdown("## 🔐 Fernet Encryption / Decryption")
 
     # Penjelasan tentang Fernet
     st.markdown("""
-    Fernet adalah algoritma kriptografi **modern dan simetris**, artinya menggunakan **satu kunci** yang sama untuk enkripsi dan dekripsi.
+📌 **Tentang Fernet:**
+- Algoritma kriptografi modern dan **simetris**
+- Menghasilkan token terenkripsi yang sudah menyimpan **integritas dan waktu**
+- Menggunakan **kunci base64 44 karakter**
+- Praktis dan aman digunakan di aplikasi modern
 
-    - Data yang dienkripsi akan **aman dan tidak bisa dibaca** tanpa kunci yang benar.
-    - Hasil enkripsi berbentuk **string panjang (token)** yang sudah mencakup informasi **integritas dan waktu pembuatan**.
-    - Cocok digunakan untuk **menyimpan informasi rahasia** di aplikasi modern.
-
-    ### 🔑 Penjelasan Tentang Kunci Fernet
-    - Fernet menggunakan **kunci base64 sepanjang 44 karakter**.
-    - Kamu bisa:
-        - 🧮 **Generate kunci otomatis**, atau
-        - ✏️ **Salin-tempel manual kunci** dari proses enkripsi sebelumnya.
-    - Jika kunci salah atau berbeda dari saat enkripsi, maka **teks tidak bisa didekripsi**.
-    """)
+🔑 **Kunci Fernet:**
+- Bisa di-*generate* otomatis (dari tombol)
+- Bisa di-*paste* dari hasil sebelumnya
+- Jika salah kunci, dekripsi akan gagal
+""")
 
     # Pilih mode
     mode = st.radio("Pilih Mode", ["Enkripsi", "Dekripsi"])
@@ -50,6 +50,13 @@ def run(log_history):
                 token = fernet.encrypt(plaintext.encode()).decode()
                 st.success("✅ Hasil Enkripsi:")
                 st.code(token)
+
+                # QR Code dari hasil
+                qr = qrcode.make(token)
+                buf = io.BytesIO()
+                qr.save(buf, format="PNG")
+                st.image(buf.getvalue(), caption="📌 QR Code dari hasil enkripsi", use_container_width=False)
+
                 st.info("💾 Simpan kunci ini untuk proses dekripsi:")
                 st.code(key_input)
                 log_history("Fernet", "Enkripsi", plaintext, token)
@@ -73,6 +80,13 @@ def run(log_history):
                 decrypted = fernet.decrypt(ciphertext.encode()).decode()
                 st.success("✅ Hasil Dekripsi:")
                 st.code(decrypted)
+
+                # QR Code dari hasil
+                qr = qrcode.make(decrypted)
+                buf = io.BytesIO()
+                qr.save(buf, format="PNG")
+                st.image(buf.getvalue(), caption="📌 QR Code dari hasil dekripsi", use_container_width=False)
+
                 log_history("Fernet", "Dekripsi", ciphertext, decrypted)
             except Exception as e:
                 st.error(f"Kesalahan dekripsi: {e}")
