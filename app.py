@@ -5,14 +5,6 @@ from algorithms import caesar, vigenere, railfence, playfair, hill, beaufort, co
 # Konfigurasi halaman
 st.set_page_config(page_title="CrypTosca", layout="centered", page_icon="🛡️")
 
-# Toggle mode gelap
-mode = st.sidebar.toggle("🌙 Mode Gelap", value=False)
-
-if mode:
-    st.markdown("<style>body { background-color: #0d3b3e; color: white; }</style>", unsafe_allow_html=True)
-else:
-    st.markdown("<style>body { background-color: #e6f7f5; color: black; }</style>", unsafe_allow_html=True)
-
 # Judul utama
 st.markdown("<h1 style='text-align: center;'>CrypTosca Pro 🛡️</h1>", unsafe_allow_html=True)
 
@@ -21,7 +13,6 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 # Fungsi untuk menyimpan log riwayat
-
 def log_history(alg, mode, input_text, result):
     st.session_state.history.append({
         "algoritma": alg,
@@ -51,10 +42,16 @@ choice = st.sidebar.selectbox("🔎 Pilih Algoritma", menu)
 
 # Konten Beranda
 if choice == "Beranda":
-    st.markdown("### 👋 Selamat Datang di CrypTosca Pro!\n\n"
-                "- Gunakan berbagai algoritma kriptografi klasik dan modern\n"
-                "- Unggah file, lihat hasil, download, dan dapatkan QR Code\n"
-                "- Silakan pilih algoritma di sidebar untuk memulai", unsafe_allow_html=True)
+    st.markdown("""
+    ### 👋 Selamat Datang di CrypTosca Pro!
+    
+    - Gunakan berbagai algoritma kriptografi klasik dan modern  
+    - Unggah file, lihat hasil, download, dan dapatkan QR Code  
+    - Silakan pilih algoritma di sidebar untuk memulai  
+
+    ---
+    📝 _Aplikasi ini dibuat untuk memenuhi tugas UAS Pemrograman Kriptografi_
+    """, unsafe_allow_html=True)
 
 # Menjalankan algoritma sesuai pilihan
 elif choice == "Caesar Cipher":
